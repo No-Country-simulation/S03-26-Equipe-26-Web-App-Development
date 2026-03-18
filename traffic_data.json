@@ -4,530 +4,583 @@
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "00:00",
-        "volume": 44,
-        "capacidade": 1000,
-        "nivel_congestionamento": 4.4,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "00:00",
-        "volume": 32,
-        "capacidade": 2000,
-        "nivel_congestionamento": 1.6,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "00:00",
-        "volume": 29,
-        "capacidade": 300,
-        "nivel_congestionamento": 9.67,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "01:00",
-        "volume": 25,
-        "capacidade": 1000,
-        "nivel_congestionamento": 2.5,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "01:00",
-        "volume": 28,
-        "capacidade": 2000,
-        "nivel_congestionamento": 1.4,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "01:00",
-        "volume": 41,
-        "capacidade": 300,
-        "nivel_congestionamento": 13.67,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "02:00",
-        "volume": 14,
-        "capacidade": 1000,
-        "nivel_congestionamento": 1.4,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "02:00",
-        "volume": 29,
-        "capacidade": 2000,
-        "nivel_congestionamento": 1.45,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "02:00",
-        "volume": 45,
-        "capacidade": 300,
-        "nivel_congestionamento": 15.0,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "03:00",
         "volume": 27,
         "capacidade": 1000,
         "nivel_congestionamento": 2.7,
-        "status": "Livre"
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "00:00",
+        "volume": 21,
+        "capacidade": 2000,
+        "nivel_congestionamento": 1.05,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "00:00",
+        "volume": 74,
+        "capacidade": 300,
+        "nivel_congestionamento": 24.67,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "01:00",
+        "volume": 34,
+        "capacidade": 1000,
+        "nivel_congestionamento": 3.4,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "01:00",
+        "volume": 24,
+        "capacidade": 2000,
+        "nivel_congestionamento": 1.2,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "01:00",
+        "volume": 33,
+        "capacidade": 300,
+        "nivel_congestionamento": 11.0,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "02:00",
+        "volume": 34,
+        "capacidade": 1000,
+        "nivel_congestionamento": 3.4,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "02:00",
+        "volume": 46,
+        "capacidade": 2000,
+        "nivel_congestionamento": 2.3,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "02:00",
+        "volume": 65,
+        "capacidade": 300,
+        "nivel_congestionamento": 21.67,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "03:00",
+        "volume": 450,
+        "capacidade": 1000,
+        "nivel_congestionamento": 45.0,
+        "status": "Livre",
+        "alerta": "🚨 ANOMALIA: Possível Incidente/Acidente"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "03:00",
-        "volume": 17,
+        "volume": 68,
         "capacidade": 2000,
-        "nivel_congestionamento": 0.85,
-        "status": "Livre"
+        "nivel_congestionamento": 3.4,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "03:00",
-        "volume": 43,
+        "volume": 78,
         "capacidade": 300,
-        "nivel_congestionamento": 14.33,
-        "status": "Livre"
+        "nivel_congestionamento": 26.0,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "04:00",
-        "volume": 16,
+        "volume": 40,
         "capacidade": 1000,
-        "nivel_congestionamento": 1.6,
-        "status": "Livre"
+        "nivel_congestionamento": 4.0,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
+        "hora": "04:00",
+        "volume": 36,
+        "capacidade": 2000,
+        "nivel_congestionamento": 1.8,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
         "hora": "04:00",
         "volume": 35,
-        "capacidade": 2000,
-        "nivel_congestionamento": 1.75,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "04:00",
-        "volume": 14,
         "capacidade": 300,
-        "nivel_congestionamento": 4.67,
-        "status": "Livre"
+        "nivel_congestionamento": 11.67,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "05:00",
-        "volume": 141,
+        "volume": 169,
         "capacidade": 1000,
-        "nivel_congestionamento": 14.1,
-        "status": "Livre"
+        "nivel_congestionamento": 16.9,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "05:00",
-        "volume": 1781,
+        "volume": 1683,
         "capacidade": 2000,
-        "nivel_congestionamento": 89.05,
-        "status": "Crítico"
+        "nivel_congestionamento": 84.15,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "05:00",
-        "volume": 100,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 33.33,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "06:00",
-        "volume": 177,
+        "volume": 274,
         "capacidade": 1000,
-        "nivel_congestionamento": 17.7,
-        "status": "Livre"
+        "nivel_congestionamento": 27.4,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "06:00",
-        "volume": 1584,
+        "volume": 1715,
         "capacidade": 2000,
-        "nivel_congestionamento": 79.2,
-        "status": "Moderado"
+        "nivel_congestionamento": 85.75,
+        "status": "Crítico",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "06:00",
-        "volume": 109,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 36.33,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "07:00",
-        "volume": 317,
+        "volume": 361,
         "capacidade": 1000,
-        "nivel_congestionamento": 31.7,
-        "status": "Livre"
+        "nivel_congestionamento": 36.1,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "07:00",
-        "volume": 725,
+        "volume": 175,
         "capacidade": 2000,
-        "nivel_congestionamento": 36.25,
-        "status": "Livre"
+        "nivel_congestionamento": 8.75,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "07:00",
-        "volume": 120,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 40.0,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "08:00",
-        "volume": 857,
+        "volume": 920,
         "capacidade": 1000,
-        "nivel_congestionamento": 85.7,
-        "status": "Crítico"
+        "nivel_congestionamento": 92.0,
+        "status": "Crítico",
+        "alerta": "⚠️ CRÍTICO: Via Saturada"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "08:00",
-        "volume": 978,
+        "volume": 880,
         "capacidade": 2000,
-        "nivel_congestionamento": 48.9,
-        "status": "Livre"
+        "nivel_congestionamento": 44.0,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "08:00",
-        "volume": 123,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 41.0,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "09:00",
-        "volume": 262,
+        "volume": 157,
         "capacidade": 1000,
-        "nivel_congestionamento": 26.2,
-        "status": "Livre"
+        "nivel_congestionamento": 15.7,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "09:00",
-        "volume": 310,
+        "volume": 402,
         "capacidade": 2000,
-        "nivel_congestionamento": 15.5,
-        "status": "Livre"
+        "nivel_congestionamento": 20.1,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "09:00",
-        "volume": 134,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 44.67,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "10:00",
-        "volume": 255,
+        "volume": 263,
         "capacidade": 1000,
-        "nivel_congestionamento": 25.5,
-        "status": "Livre"
+        "nivel_congestionamento": 26.3,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "10:00",
-        "volume": 467,
+        "volume": 266,
         "capacidade": 2000,
-        "nivel_congestionamento": 23.35,
-        "status": "Livre"
+        "nivel_congestionamento": 13.3,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "10:00",
-        "volume": 110,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 36.67,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "11:00",
-        "volume": 499,
-        "capacidade": 1000,
-        "nivel_congestionamento": 49.9,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "11:00",
-        "volume": 1501,
-        "capacidade": 2000,
-        "nivel_congestionamento": 75.05,
-        "status": "Moderado"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "11:00",
-        "volume": 126,
-        "capacidade": 300,
-        "nivel_congestionamento": 42.0,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "12:00",
-        "volume": 375,
-        "capacidade": 1000,
-        "nivel_congestionamento": 37.5,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "12:00",
-        "volume": 112,
-        "capacidade": 2000,
-        "nivel_congestionamento": 5.6,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "12:00",
-        "volume": 140,
-        "capacidade": 300,
-        "nivel_congestionamento": 46.67,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "13:00",
-        "volume": 477,
-        "capacidade": 1000,
-        "nivel_congestionamento": 47.7,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "13:00",
-        "volume": 818,
-        "capacidade": 2000,
-        "nivel_congestionamento": 40.9,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "13:00",
-        "volume": 134,
-        "capacidade": 300,
-        "nivel_congestionamento": 44.67,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "14:00",
-        "volume": 280,
-        "capacidade": 1000,
-        "nivel_congestionamento": 28.0,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "14:00",
-        "volume": 268,
-        "capacidade": 2000,
-        "nivel_congestionamento": 13.4,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "14:00",
-        "volume": 139,
-        "capacidade": 300,
-        "nivel_congestionamento": 46.33,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "15:00",
-        "volume": 378,
-        "capacidade": 1000,
-        "nivel_congestionamento": 37.8,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "15:00",
-        "volume": 976,
-        "capacidade": 2000,
-        "nivel_congestionamento": 48.8,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "15:00",
-        "volume": 149,
-        "capacidade": 300,
-        "nivel_congestionamento": 49.67,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "16:00",
-        "volume": 493,
-        "capacidade": 1000,
-        "nivel_congestionamento": 49.3,
-        "status": "Livre"
-    },
-    {
-        "id_via": 2,
-        "nome": "Rodovia do Aeroporto",
-        "tipo": "Rodovia",
-        "hora": "16:00",
-        "volume": 203,
-        "capacidade": 2000,
-        "nivel_congestionamento": 10.15,
-        "status": "Livre"
-    },
-    {
-        "id_via": 3,
-        "nome": "Rua das Flores",
-        "tipo": "Residencial",
-        "hora": "16:00",
-        "volume": 115,
-        "capacidade": 300,
-        "nivel_congestionamento": 38.33,
-        "status": "Livre"
-    },
-    {
-        "id_via": 1,
-        "nome": "Av. Central",
-        "tipo": "Arterial",
-        "hora": "17:00",
         "volume": 301,
         "capacidade": 1000,
         "nivel_congestionamento": 30.1,
-        "status": "Livre"
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "11:00",
+        "volume": 411,
+        "capacidade": 2000,
+        "nivel_congestionamento": 20.55,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "11:00",
+        "volume": 150,
+        "capacidade": 300,
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "12:00",
+        "volume": 306,
+        "capacidade": 1000,
+        "nivel_congestionamento": 30.6,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "12:00",
+        "volume": 345,
+        "capacidade": 2000,
+        "nivel_congestionamento": 17.25,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "12:00",
+        "volume": 150,
+        "capacidade": 300,
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "13:00",
+        "volume": 439,
+        "capacidade": 1000,
+        "nivel_congestionamento": 43.9,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "13:00",
+        "volume": 872,
+        "capacidade": 2000,
+        "nivel_congestionamento": 43.6,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "13:00",
+        "volume": 150,
+        "capacidade": 300,
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "14:00",
+        "volume": 235,
+        "capacidade": 1000,
+        "nivel_congestionamento": 23.5,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "14:00",
+        "volume": 258,
+        "capacidade": 2000,
+        "nivel_congestionamento": 12.9,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "14:00",
+        "volume": 150,
+        "capacidade": 300,
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "15:00",
+        "volume": 260,
+        "capacidade": 1000,
+        "nivel_congestionamento": 26.0,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "15:00",
+        "volume": 302,
+        "capacidade": 2000,
+        "nivel_congestionamento": 15.1,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "15:00",
+        "volume": 150,
+        "capacidade": 300,
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "16:00",
+        "volume": 441,
+        "capacidade": 1000,
+        "nivel_congestionamento": 44.1,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 2,
+        "nome": "Rodovia do Aeroporto",
+        "tipo": "Rodovia",
+        "hora": "16:00",
+        "volume": 524,
+        "capacidade": 2000,
+        "nivel_congestionamento": 26.2,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 3,
+        "nome": "Rua das Flores",
+        "tipo": "Residencial",
+        "hora": "16:00",
+        "volume": 150,
+        "capacidade": 300,
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
+    },
+    {
+        "id_via": 1,
+        "nome": "Av. Central",
+        "tipo": "Arterial",
+        "hora": "17:00",
+        "volume": 216,
+        "capacidade": 1000,
+        "nivel_congestionamento": 21.6,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "17:00",
-        "volume": 980,
+        "volume": 929,
         "capacidade": 2000,
-        "nivel_congestionamento": 49.0,
-        "status": "Livre"
+        "nivel_congestionamento": 46.45,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
@@ -537,186 +590,205 @@
         "volume": 150,
         "capacidade": 300,
         "nivel_congestionamento": 50.0,
-        "status": "Moderado"
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "18:00",
-        "volume": 925,
+        "volume": 965,
         "capacidade": 1000,
-        "nivel_congestionamento": 92.5,
-        "status": "Crítico"
+        "nivel_congestionamento": 96.5,
+        "status": "Crítico",
+        "alerta": "⚠️ CRÍTICO: Via Saturada"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "18:00",
-        "volume": 437,
+        "volume": 602,
         "capacidade": 2000,
-        "nivel_congestionamento": 21.85,
-        "status": "Livre"
+        "nivel_congestionamento": 30.1,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "18:00",
-        "volume": 147,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 49.0,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "19:00",
-        "volume": 437,
+        "volume": 473,
         "capacidade": 1000,
-        "nivel_congestionamento": 43.7,
-        "status": "Livre"
+        "nivel_congestionamento": 47.3,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "19:00",
-        "volume": 158,
+        "volume": 168,
         "capacidade": 2000,
-        "nivel_congestionamento": 7.9,
-        "status": "Livre"
+        "nivel_congestionamento": 8.4,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "19:00",
-        "volume": 108,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 36.0,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "20:00",
-        "volume": 363,
+        "volume": 449,
         "capacidade": 1000,
-        "nivel_congestionamento": 36.3,
-        "status": "Livre"
+        "nivel_congestionamento": 44.9,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "20:00",
-        "volume": 208,
+        "volume": 803,
         "capacidade": 2000,
-        "nivel_congestionamento": 10.4,
-        "status": "Livre"
+        "nivel_congestionamento": 40.15,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "20:00",
-        "volume": 108,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 36.0,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "21:00",
-        "volume": 133,
+        "volume": 494,
         "capacidade": 1000,
-        "nivel_congestionamento": 13.3,
-        "status": "Livre"
+        "nivel_congestionamento": 49.4,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "21:00",
-        "volume": 163,
+        "volume": 175,
         "capacidade": 2000,
-        "nivel_congestionamento": 8.15,
-        "status": "Livre"
+        "nivel_congestionamento": 8.75,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "21:00",
-        "volume": 120,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 40.0,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "22:00",
-        "volume": 200,
+        "volume": 191,
         "capacidade": 1000,
-        "nivel_congestionamento": 20.0,
-        "status": "Livre"
+        "nivel_congestionamento": 19.1,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "22:00",
-        "volume": 1884,
+        "volume": 1891,
         "capacidade": 2000,
-        "nivel_congestionamento": 94.2,
-        "status": "Crítico"
+        "nivel_congestionamento": 94.55,
+        "status": "Crítico",
+        "alerta": "⚠️ CRÍTICO: Via Saturada"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "22:00",
-        "volume": 130,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 43.33,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 1,
         "nome": "Av. Central",
         "tipo": "Arterial",
         "hora": "23:00",
-        "volume": 197,
+        "volume": 339,
         "capacidade": 1000,
-        "nivel_congestionamento": 19.7,
-        "status": "Livre"
+        "nivel_congestionamento": 33.9,
+        "status": "Livre",
+        "alerta": "Fluxo Normal"
     },
     {
         "id_via": 2,
         "nome": "Rodovia do Aeroporto",
         "tipo": "Rodovia",
         "hora": "23:00",
-        "volume": 1566,
+        "volume": 1885,
         "capacidade": 2000,
-        "nivel_congestionamento": 78.3,
-        "status": "Moderado"
+        "nivel_congestionamento": 94.25,
+        "status": "Crítico",
+        "alerta": "⚠️ CRÍTICO: Via Saturada"
     },
     {
         "id_via": 3,
         "nome": "Rua das Flores",
         "tipo": "Residencial",
         "hora": "23:00",
-        "volume": 139,
+        "volume": 150,
         "capacidade": 300,
-        "nivel_congestionamento": 46.33,
-        "status": "Livre"
+        "nivel_congestionamento": 50.0,
+        "status": "Moderado",
+        "alerta": "Fluxo Normal"
     }
 ]
