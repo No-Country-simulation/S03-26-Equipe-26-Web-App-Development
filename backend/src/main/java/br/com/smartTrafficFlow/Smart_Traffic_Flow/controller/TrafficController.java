@@ -19,8 +19,8 @@ public class TrafficController {
 
     @PostMapping("/load")
     public String loadData() {
-        service .loadDataFromJson();
-        return "Dados carregados!";
+        service .loadData();
+        return "Dados carregados com sucesso!";
     }
 
     @GetMapping
