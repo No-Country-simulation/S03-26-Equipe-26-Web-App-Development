@@ -22,5 +22,5 @@ public class TrafficData {
     private int capacidade;
     private double nivelCongestionamento;
     private String status;
-    private String aleta;
+    private String alerta;
 }
