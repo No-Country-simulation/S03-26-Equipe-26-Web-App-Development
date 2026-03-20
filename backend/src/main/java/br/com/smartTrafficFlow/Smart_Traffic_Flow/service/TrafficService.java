@@ -57,10 +57,24 @@ public class TrafficService {
         return repository.save(data);
     }
 
-    public List<TrafficData> findByFilters(String cidade, String status){
-        String c = (cidade == null) ? "" : cidade;
-        String s = (status == null) ? "" : status;
+    public List<TrafficData> findByFilters(String clima, Double nivel, String alerta){
 
-        return repository.findByNomeContainingIgnoreCaseAndStatusContainingIgnoreCase(c, s);
+        if (clima != null && nivel != null) {
+            return repository.findByClimaAndNivelGreaterThan(clima, nivel);
+        }
+
+        if (clima != null) {
+            return repository.findByClima(clima);
+        }
+
+        if (nivel != null) {
+            return repository.findByNivelGreaterThan(nivel);
+        }
+
+        if (alerta != null) {
+            return repository.findByAlerta(alerta);
+        }
+
+        return repository.findAll();
     }
 }

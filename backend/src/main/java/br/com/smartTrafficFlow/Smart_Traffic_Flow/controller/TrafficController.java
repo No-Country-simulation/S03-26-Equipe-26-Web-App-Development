@@ -40,10 +40,11 @@ public class TrafficController {
 
     @GetMapping("/filter")
     public List<TrafficData> filterTraffic(
-            @RequestParam(required = false) String cidade,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String clima,
+            @RequestParam(required = false) Double nivel,
+            @RequestParam(required = false) String alerta) {
 
-        return service.findByFilters(cidade, status);
+        return service.findByFilters(clima, nivel, alerta);
     }
 
 }

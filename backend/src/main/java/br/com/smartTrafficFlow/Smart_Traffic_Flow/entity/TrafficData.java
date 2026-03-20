@@ -1,10 +1,9 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.locationtech.jts.geom.Point;
 
 @Entity
 @Getter
@@ -22,11 +21,14 @@ public class TrafficData {
     private String nome;
     private String tipo;
     private String hora;
+    private String clima;
     private int volume;
     private int capacidade;
 
-    @Column(name = "nivel_congestionamento")
-    private double nivelCongestionamento;
+    private double nivel;
     private String status;
     private String alerta;
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    private Point geom;
+
 }
