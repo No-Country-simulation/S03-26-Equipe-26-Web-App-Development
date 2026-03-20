@@ -16,25 +16,36 @@ public class TrafficService {
     private final TrafficRepository repository;
 
     public TrafficService(TrafficRepository repository) {
+
         this.repository = repository;
     }
 
-    public void loadDataFromJson() {
-
+    public List<TrafficData> loadFromJson(){
         try {
             ObjectMapper mapper = new ObjectMapper();
 
             InputStream inputStream = getClass()
-                    .getResourceAsStream("/traffic_data.json");
+                    .getClassLoader()
+                    .getResourceAsStream("traffic_data.json");
 
-            List<TrafficData> dados = mapper.readValue(
-                    inputStream,
-                    new TypeReference<List<TrafficData>>() {
-                    }
-            );
-            repository.saveAll(dados);
-        } catch (Exception e){
-            throw new RuntimeException("Erro ao carrgar JSON", e);
+            if (inputStream == null) {
+                throw new RuntimeException("Arquivo Traffic_data.json não encontrado");
+            }
+
+            return mapper.readValue(inputStream, new TypeReference<List<TrafficData>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao carregar JSON", e);
+        }
+
+    }
+
+    public void loadData() {
+        List<TrafficData> dados = loadFromJson();
+
+        for (TrafficData d : dados){
+            if (!repository.existsByIdviaAndHora(d.getIdvia(), d.getHora())){
+                repository.save(d);
+            }
         }
     }
 
