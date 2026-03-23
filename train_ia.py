@@ -11,15 +11,18 @@ def train_traffic_ia():
         memoria_ia = {}
         for registro in dados:
             clima = registro.get('clima', 'Limpo')
-            nivel = registro['nivel']
+            # Ajustado para o novo nome de campo do Everton
+            nivel = registro.get('nivel_congestionamento', 0) 
+            
             if clima not in memoria_ia:
                 memoria_ia[clima] = []
             memoria_ia[clima].append(nivel)
         
         print("\n--- RESULTADO DO TREINAMENTO (MEDIAS APRENDIDAS) ---")
         for clima, niveis in memoria_ia.items():
-            media = sum(niveis) / len(niveis)
-            print(f"Clima [{clima}] -> Nivel medio de transito: {media:.2f}%")
+            if niveis:
+                media = sum(niveis) / len(niveis)
+                print(f"Clima [{clima}] -> Nivel medio de transito: {media:.2f}%")
         
         return memoria_ia
 
