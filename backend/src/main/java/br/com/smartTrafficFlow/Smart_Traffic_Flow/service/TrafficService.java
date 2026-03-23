@@ -52,4 +52,15 @@ public class TrafficService {
     public List<TrafficData> getAll(){
         return repository.findAll();
     }
+
+    public TrafficData save(TrafficData data){
+        return repository.save(data);
+    }
+
+    public List<TrafficData> findByFilters(String cidade, String status){
+        String c = (cidade == null) ? "" : cidade;
+        String s = (status == null) ? "" : status;
+
+        return repository.findByNomeContainingIgnoreCaseAndStatusContainingIgnoreCase(c, s);
+    }
 }
