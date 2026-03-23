@@ -20,7 +20,7 @@ public class TrafficDataDTO {
     private int capacidade;
     private double nivel;
     private StatusTrafego status;
-    private String alerta;
+    private TrafficAlert alerta;
 
     private Double lat;
     private Double lng;

@@ -36,7 +36,8 @@ public class TrafficData {
     @Enumerated(EnumType.STRING)
     private StatusTrafego status;
 
-    private String alerta;
+    @Enumerated(EnumType.STRING)
+    private TrafficAlert alerta;
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point geom;
 
