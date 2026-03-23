@@ -1,0 +1,9 @@
+SmartTrafficFlow
+
+- Escolhe o local (cidade, trajeto, bairro ...) - a definir
+- Ao selecionar/clicar irá mostrar do lado correto as informações: 
+    tipo de via, 
+    volume estimado de veiculos, 
+    ocorrencia de eventos proximos, 
+    horarios, 
+    nivel de trafego em dferentes situações padroes de horarios citicos
