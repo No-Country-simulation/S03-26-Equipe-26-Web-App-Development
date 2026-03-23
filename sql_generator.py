@@ -1,16 +1,17 @@
 import json
 
+# Lendo o JSON original
 with open('traffic_data.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 
+# Criando o SQL LIMPO e SEM CONFLITOS
 with open('import.sql', 'w', encoding='utf-8') as f:
     for item in data:
-        # A Mágica do PostGIS: Criando um ponto geográfico (Point)
-        geom = f"ST_GeomFromText('POINT({item['lng']} {item['lat']})', 4326)"
-        
-        sql = (f"INSERT INTO traffic_data (idvia, nome, hora, volume, capacidade, nivel, alerta, geom) "
-               f"VALUES ({item['id_via']}, '{item['nome']}', '{item['hora']}', {item['volume']}, "
-               f"{item['capacidade']}, {item['nivel']}, '{item['alerta']}', {geom});\n")
+        # Usando nivel_congestionamento e idvia (PADRÃO DA ENTITY JAVA)
+        # Removendo ST_GeomFromText pois a Entity do Everton NÃO TEM esse campo
+        sql = (f"INSERT INTO traffic_data (idvia, nome, hora, volume, capacidade, nivel_congestionamento, alerta) "
+               f"VALUES ({item['idvia']}, '{item['nome']}', '{item['hora']}', {item['volume']}, "
+               f"{item['capacidade']}, {item['nivel_congestionamento']}, '{item['alerta']}');\n")
         f.write(sql)
 
-print("🚀 SQL PARA POSTGIS GERADO COM SUCESSO!")
+print("✅ SUCESSO: import.sql gerado sem conflitos e pronto para a Sprint!")
