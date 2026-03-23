@@ -9,7 +9,6 @@ public interface TrafficRepository extends JpaRepository<TrafficData, Long> {
 
     boolean existsByIdviaAndHora(Integer idVia, String hora);
 
-    List<TrafficData> findByNomeContainingIgnoreCaseAndStatusContainingIgnoreCase(String nome, String status);
 
     List<TrafficData> findByClimaAndNivelGreaterThan(String clima, Double nivel);
 
