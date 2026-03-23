@@ -1,0 +1,42 @@
+
+.home-header {
+    background-color: rgb(14, 14, 131);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.main {
+    padding: 10px;
+}
+
+.main-option {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 20px;
+}
+
+.main-local {
+    height: 150px;
+}
+
+.option-mark {
+    border-bottom: 3px solid rgb(235, 231, 23);
+}
+
+input {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    width: 50%;
+    background-color: rgb(245, 245, 239);
+    color: rgb(14, 14, 131);
+    margin-bottom: 10px;
+}
+
+#map {
+    width: 70%;
+    height: 300px;
+    margin: auto;
+}
