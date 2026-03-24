@@ -1,47 +1,58 @@
 # Smart Traffic Flow
 
-Backend REST para simulacao, carga e consulta de dados de trafego urbano. O projeto esta sendo construído em Spring Boot e foi organizado para crescer de forma previsivel, com documentacao separada por dominio e atualizavel ao longo das proximas sprints.
+Aplicação full stack para simulação, visualização e consulta de dados de tráfego urbano. O projeto hoje combina um backend em Spring Boot com um frontend em React/Vite, e a documentação foi organizada por domínio para continuar escalando conforme novas features entrarem.
 
-## Visao Geral
+## Visão Geral
 
-O estado atual da aplicacao inclui:
+O estado atual do projeto inclui:
 
-- API REST com consulta, filtro e criacao de registros de trafego
-- persistencia em H2 em memoria
-- carga inicial automatica via `import.sql`
-- organizacao em camadas: `controller`, `service`, `repository` e `entity`
-- console H2 habilitado para inspecao local
+- backend REST em Spring Boot para carga, persistência e consulta de dados de tráfego
+- frontend em React com tela inicial e mapa interativo baseado em Leaflet
+- persistência em H2 em memória no backend
+- carga inicial automática via `import.sql`
+- documentação modular separada por API, dados e frontend
 
-Limitacoes atuais conhecidas:
+Limitações atuais conhecidas:
 
-- `POST /traffic/load` depende de `traffic_data.json` no classpath, mas esse arquivo ainda nao esta em `backend/src/main/resources`
-- ainda nao ha validacao de payload, tratamento global de erros, paginacao nem autenticacao
-- a cobertura de testes ainda esta no nivel inicial
+- `POST /traffic/load` depende de `traffic_data.json` no classpath e esse arquivo ainda não está em `backend/src/main/resources`
+- o frontend ainda está em fase inicial e não mostra integração explícita com a API nas telas atuais
+- `leaflet` e `leaflet/dist/leaflet.css` são usados no frontend, mas essa dependência não aparece declarada em `frontend/package.json`
+- ainda não há padronização completa de erros, autenticação nem suíte robusta de testes
 
 ## Stack
+
+### Backend
 
 - Java 21
 - Spring Boot 3.5.11
 - Spring Web
 - Spring Data JPA
 - H2 Database
+- Hibernate Spatial
+- H2GIS
 - Lombok
 - Maven Wrapper
 
-## Documentacao
+### Frontend
 
-O repositorio passa a seguir uma estrutura de documentacao modular:
+- React 19
+- Vite 8
+- ESLint
+
+## Documentação
+
+O repositório segue uma estrutura de documentação modular:
 
 - [API](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/api.md)
 - [Dados](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/dados.md)
-
-Essa separacao evita que o `README.md` vire um arquivo monolitico e facilita evoluir a documentacao por area.
+- [Frontend](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/frontend.md)
 
 ## Arquitetura
 
 ```mermaid
 flowchart LR
-    U[Usuario / Front-end] -->|HTTP REST| C[TrafficController<br/>/traffic]
+    U[Usuário] --> F[Frontend React/Vite]
+    F -->|HTTP REST| C[TrafficController<br/>/traffic]
 
     subgraph API["Backend Spring Boot"]
         C -->|POST /traffic/load| S[TrafficService]
@@ -49,13 +60,14 @@ flowchart LR
         C -->|POST /traffic| S
         C -->|GET /traffic/filter| S
 
-        S -->|save / findAll / filtro / deduplicacao| R[TrafficRepository]
+        S -->|JSON -> DTO -> Entity| M[Mapper no service]
+        S -->|save / findAll / filtros| R[TrafficRepository]
         S -->|loadFromJson| J[(traffic_data.json)]
-        R --> D[(H2 Database<br/>traffic_data)]
+        R --> D[(H2 + Spatial<br/>traffic_data)]
     end
 
+    F --> L[Leaflet + OpenStreetMap]
     D -. carga inicial .-> SQL[(import.sql)]
-    E[TrafficData Entity] --> R
 ```
 
 ## Estrutura do Projeto
@@ -64,29 +76,37 @@ flowchart LR
 .
 |-- backend/
 |   |-- pom.xml
-|   |-- src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/
-|   |   |-- SmartTrafficFlowApplication.java
-|   |   |-- controller/TrafficController.java
-|   |   |-- service/TrafficService.java
-|   |   |-- repository/TrafficRepository.java
-|   |   `-- entity/TrafficData.java
-|   `-- src/main/resources/
-|       |-- application.properties
-|       `-- import.sql
+|   `-- src/main/
+|       |-- java/br/com/smartTrafficFlow/Smart_Traffic_Flow/
+|       |   |-- controller/
+|       |   |-- dto/
+|       |   |-- entity/
+|       |   |-- enums/
+|       |   |-- repository/
+|       |   `-- service/
+|       `-- resources/
+|           |-- application.properties
+|           `-- import.sql
 |-- docs/
 |   |-- api.md
-|   `-- dados.md
-|-- generator.py
-|-- sql_generator.py
-|-- train_ia.py
-|-- traffic_data.json
-|-- import.sql
+|   |-- dados.md
+|   `-- frontend.md
+|-- frontend/
+|   |-- package.json
+|   |-- vite.config.js
+|   `-- src/
+|       |-- App.jsx
+|       `-- pages/home/Home.jsx
+|-- LICENSE
+|-- README.md
 `-- README_DADOS.md
 ```
 
 ## Como Executar
 
-No diretorio `backend`:
+### Backend
+
+No diretório `backend`:
 
 ```bash
 ./mvnw spring-boot:run
@@ -98,36 +118,44 @@ No Windows PowerShell:
 .\mvnw.cmd spring-boot:run
 ```
 
-Aplicacao disponivel por padrao em:
+Backend disponível por padrão em:
 
 - API: `http://localhost:8080`
 - Console H2: `http://localhost:8080/h2-console`
 
-Configuracao atual do banco:
+### Frontend
 
-- JDBC URL: `jdbc:h2:mem:smarttraffic`
-- User: `sa`
-- Password: vazio
+No diretório `frontend`:
 
-## Roadmap de Documentacao
+```bash
+npm install
+npm run dev
+```
 
-Sempre que a API evoluir, atualizar pelo menos:
+Frontend Vite disponível por padrão em:
+
+- `http://localhost:5173`
+
+## Roadmap de Documentação
+
+Sempre que o projeto evoluir, atualizar pelo menos:
 
 1. `README.md` para status geral e arquitetura
 2. `docs/api.md` para endpoints, payloads e respostas
-3. `docs/dados.md` para massa de dados, geracao e contrato
+3. `docs/dados.md` para massa de dados e contrato
+4. `docs/frontend.md` para telas, stack e integração com a API
 
-## Referencias do Codigo
+## Referências do Código
 
-- [SmartTrafficFlowApplication.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/SmartTrafficFlowApplication.java)
 - [TrafficController.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/controller/TrafficController.java)
 - [TrafficService.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/service/TrafficService.java)
-- [TrafficRepository.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/repository/TrafficRepository.java)
 - [TrafficData.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/entity/TrafficData.java)
-- [application.properties](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/resources/application.properties)
+- [TrafficDataDTO.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/dto/TrafficDataDTO.java)
+- [Home.jsx](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/src/pages/home/Home.jsx)
+- [package.json](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/package.json)
 
-## Licenca
+## Licença
 
-Este projeto esta licenciado sob a MIT License.
+Este projeto está licenciado sob a MIT License.
 
 Consulte [LICENSE](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/LICENSE).

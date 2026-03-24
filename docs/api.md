@@ -1,10 +1,10 @@
 # API
 
-Este documento concentra os endpoints, exemplos de uso, comportamento atual e observacoes de implementacao da API.
+Este documento concentra os endpoints, comportamento atual e contrato principal do backend.
 
 ## Base URL
 
-Ambiente local padrao:
+Ambiente local padrão:
 
 - `http://localhost:8080`
 
@@ -12,7 +12,7 @@ Base path atual:
 
 - `/traffic`
 
-## Endpoints Disponiveis
+## Endpoints Disponíveis
 
 ### `GET /traffic`
 
@@ -24,45 +24,37 @@ Exemplo:
 curl http://localhost:8080/traffic
 ```
 
-Resposta esperada:
-
-```json
-[
-  {
-    "id": 1,
-    "idvia": 1,
-    "nome": "Av. Central",
-    "tipo": "Arterial",
-    "hora": "08:00",
-    "volume": 920,
-    "capacidade": 1000,
-    "nivelCongestionamento": 92.0,
-    "status": "Critico",
-    "alerta": "Via Saturada"
-  }
-]
-```
-
 ### `GET /traffic/filter`
 
-Filtra registros por nome da via e status.
+Filtra registros com base nos parâmetros atualmente suportados pelo backend.
 
-Parametros opcionais:
+Parâmetros opcionais:
 
-- `cidade`
-- `status`
+- `clima`
+- `nivel`
+- `alerta`
 
-Exemplo:
+Exemplos:
 
 ```bash
-curl "http://localhost:8080/traffic/filter?cidade=Central&status=Critico"
+curl "http://localhost:8080/traffic/filter?clima=CHUVA_LEVE"
+```
+
+```bash
+curl "http://localhost:8080/traffic/filter?nivel=70"
+```
+
+```bash
+curl "http://localhost:8080/traffic/filter?alerta=CONGESTIONAMENTO_CRITICO"
 ```
 
 Comportamento atual:
 
-- se `cidade` nao for enviado, o filtro considera string vazia
-- se `status` nao for enviado, o filtro considera string vazia
-- o filtro usa busca parcial com `ContainingIgnoreCase`
+- se `clima` e `nivel` forem enviados juntos, o backend usa `findByClimaAndNivelGreaterThan(...)`
+- se apenas `clima` for enviado, usa `findByClima(...)`
+- se apenas `nivel` for enviado, usa `findByNivelGreaterThan(...)`
+- se apenas `alerta` for enviado, usa `findByAlerta(...)`
+- sem parâmetros, retorna todos os registros
 
 ### `POST /traffic`
 
@@ -74,48 +66,39 @@ Payload de exemplo:
 {
   "idvia": 1,
   "nome": "Av. Central",
-  "tipo": "Arterial",
+  "tipo": "ARTERIAL",
   "hora": "08:00",
+  "clima": "LIMPO",
   "volume": 920,
   "capacidade": 1000,
-  "nivelCongestionamento": 92.0,
-  "status": "Critico",
-  "alerta": "Via Saturada"
+  "nivel": 92.0,
+  "status": "CRITICO",
+  "alerta": "CONGESTIONAMENTO_CRITICO"
 }
 ```
 
-Exemplo:
+Observações:
 
-```bash
-curl -X POST http://localhost:8080/traffic \
-  -H "Content-Type: application/json" \
-  -d '{"idvia":1,"nome":"Av. Central","tipo":"Arterial","hora":"08:00","volume":920,"capacidade":1000,"nivelCongestionamento":92.0,"status":"Critico","alerta":"Via Saturada"}'
-```
-
-Resposta atual:
-
-- `201 Created`
-- corpo com a entidade persistida
-
-Observacao:
-
-- ainda nao ha validacoes de entrada nem padronizacao de erros
+- o backend hoje trabalha com enums para `tipo`, `clima`, `status` e `alerta`
+- a entidade persistida também possui `geom`, embora esse campo não apareça naturalmente no exemplo simples acima
 
 ### `POST /traffic/load`
 
-Tenta carregar dados de um arquivo JSON e persisti-los evitando duplicidade por `idvia + hora`.
+Tenta carregar dados de um arquivo JSON e persistí-los evitando duplicidade por `idvia + hora`.
 
 Fluxo implementado:
 
 1. o controller chama `TrafficService.loadData()`
-2. o service tenta ler `traffic_data.json` do classpath
-3. cada item e salvo apenas se `existsByIdviaAndHora(...)` retornar falso
+2. o service lê `traffic_data.json` do classpath em uma lista de `TrafficDataDTO`
+3. cada DTO é convertido para `TrafficData`
+4. `lat/lng` são convertidos em `Point`
+5. o registro só é salvo se `existsByIdviaAndHora(...)` retornar falso
 
 Estado atual:
 
-- a implementacao existe
-- o arquivo JSON exigido por esse fluxo ainda nao esta em `backend/src/main/resources`
-- hoje a carga inicial operacional da aplicacao acontece via `import.sql`
+- a implementação existe
+- o arquivo JSON exigido por esse fluxo ainda não está em `backend/src/main/resources`
+- na prática, a carga inicial operacional continua acontecendo via `import.sql`
 
 ## Fluxo de Consulta
 
@@ -125,11 +108,11 @@ sequenceDiagram
     participant Controller as TrafficController
     participant Service as TrafficService
     participant Repo as TrafficRepository
-    participant DB as H2
+    participant DB as H2/H2GIS
 
-    Client->>Controller: GET /traffic/filter?cidade=Av.&status=Livre
-    Controller->>Service: findByFilters(cidade, status)
-    Service->>Repo: findByNomeContainingIgnoreCaseAndStatusContainingIgnoreCase(...)
+    Client->>Controller: GET /traffic/filter?clima=LIMPO&nivel=70
+    Controller->>Service: findByFilters(clima, nivel, alerta)
+    Service->>Repo: findByClimaAndNivelGreaterThan(...)
     Repo->>DB: SELECT com filtros
     DB-->>Repo: registros
     Repo-->>Service: List<TrafficData>
@@ -145,20 +128,30 @@ classDiagram
         +Long id
         +Integer idvia
         +String nome
-        +String tipo
+        +TypeOfRoute tipo
         +String hora
+        +Climate clima
         +int volume
         +int capacidade
-        +double nivelCongestionamento
-        +String status
-        +String alerta
+        +double nivel
+        +StatusTrafego status
+        +TrafficAlert alerta
+        +Point geom
     }
 ```
 
+## Dependências Relevantes do Backend
+
+- Spring Boot Web
+- Spring Data JPA
+- H2
+- Hibernate Spatial
+- H2GIS
+
 ## Melhorias Recomendadas
 
-- adicionar DTOs de request e response
-- incluir Bean Validation
+- adicionar DTOs de response e não expor diretamente a entidade
+- incluir Bean Validation nas entradas
 - padronizar erros com `@ControllerAdvice`
 - documentar a API com Swagger/OpenAPI
-- adicionar paginacao e ordenacao nas consultas
+- alinhar definitivamente o contrato do JSON de carga com o modelo persistido

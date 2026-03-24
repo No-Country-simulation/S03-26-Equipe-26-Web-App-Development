@@ -1,50 +1,49 @@
 # Dados
 
-Este documento resume a logica de geracao, os formatos de massa de dados e os pontos de atencao para integracao entre scripts auxiliares e a API.
+Este documento resume a lógica de geração, os formatos de massa de dados e os pontos de atenção entre scripts auxiliares, DTOs e entidade persistida.
 
 ## Fontes de Dados no Projeto
 
-Hoje o repositorio possui duas frentes principais de dados:
+Hoje o repositório possui duas frentes principais de dados:
 
-- `import.sql`, usado pela API no boot para carga inicial da tabela `traffic_data`
-- `traffic_data.json`, gerado por scripts auxiliares e ainda nao plugado de forma definitiva no classpath da aplicacao
+- `backend/src/main/resources/import.sql`, usado no boot da aplicação para carga inicial da tabela `traffic_data`
+- `traffic_data.json` na raiz, usado como base para scripts auxiliares, mas ainda não encaixado no classpath oficial do backend
 
 Arquivos relacionados:
 
 - `generator.py`
-- `sql_generator.py`
-- `train_ia.py`
 - `traffic_data.json`
-- `import.sql`
+- `backend/src/main/resources/import.sql`
+- [TrafficDataDTO.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/dto/TrafficDataDTO.java)
 
-## Logica de Simulacao
+## Lógica de Simulação
 
-O motor de simulacao considera:
+O motor de simulação considera:
 
 - picos comerciais em `08:00` e `18:00` para vias arteriais
-- picos logisticos na madrugada e no fim da noite para a rodovia do aeroporto
-- eventos aleatorios para simular incidentes ou anomalias operacionais
+- picos logísticos na madrugada e no fim da noite para a rodovia do aeroporto
+- eventos aleatórios para simular incidentes ou anomalias operacionais
 
-## Formato Atual do JSON Gerado
+## Formato Atual do DTO de Carga
 
-O arquivo `traffic_data.json` da raiz segue majoritariamente esta estrutura:
+O backend hoje espera um contrato próximo deste em `TrafficDataDTO`:
 
-| Campo | Descricao | Exemplo |
+| Campo | Tipo | Observação |
 | :--- | :--- | :--- |
-| `id_via` | Identificador da via | `1` |
-| `nome` | Nome da via monitorada | `Av. Central` |
-| `lat` | Latitude aproximada do ponto monitorado | `-23.5505` |
-| `lng` | Longitude aproximada do ponto monitorado | `-46.6333` |
-| `hora` | Faixa horaria da medicao | `14:00` |
-| `clima` | Condicao climatica simulada | `Chuva Leve` |
-| `volume` | Quantidade de veiculos detectados | `850` |
-| `capacidade` | Capacidade estimada da via | `1000` |
-| `nivel` | Percentual de ocupacao da via | `85.0` |
-| `alerta` | Indicador textual de situacao | `Normal` |
+| `idvia` | `Integer` | identificador da via |
+| `nome` | `String` | nome da via |
+| `tipo` | `TypeOfRoute` | enum |
+| `hora` | `String` | faixa horária |
+| `clima` | `Climate` | enum |
+| `volume` | `int` | volume medido |
+| `capacidade` | `int` | capacidade da via |
+| `nivel` | `double` | nível de ocupação |
+| `status` | `StatusTrafego` | enum |
+| `alerta` | `TrafficAlert` | enum |
+| `lat` | `Double` | latitude para gerar `geom` |
+| `lng` | `Double` | longitude para gerar `geom` |
 
 ## Modelo Persistido Pela API
-
-A API atualmente persiste a entidade `TrafficData` com os seguintes campos:
 
 ```mermaid
 erDiagram
@@ -54,42 +53,46 @@ erDiagram
         VARCHAR nome
         VARCHAR tipo
         VARCHAR hora
+        VARCHAR clima
         INT volume
         INT capacidade
-        DOUBLE nivel_congestionamento
+        DOUBLE nivel
         VARCHAR status
         VARCHAR alerta
+        GEOMETRY geom
     }
 ```
 
-## Divergencias Atuais Entre JSON e Entidade
+## Pipeline Atual de Carga
 
-Hoje existem diferencas que precisam ser tratadas antes de uma integracao definitiva:
+```mermaid
+flowchart LR
+    A[traffic_data.json] --> B[TrafficDataDTO]
+    B --> C[TrafficService]
+    C --> D[TrafficData]
+    D --> E[geom Point 4326]
+    D --> F[(traffic_data)]
+```
 
-- `id_via` no JSON versus `idvia` na entidade
-- `nivel` no JSON versus `nivelCongestionamento` na entidade
-- `lat`, `lng` e `clima` existem no JSON mas nao fazem parte da entidade persistida
-- `tipo` e `status` existem na entidade e no SQL atual, mas nao aparecem de forma consistente no JSON exibido na raiz
+## Divergências Atuais
 
-## Regras de Alerta
+Ainda existe uma lacuna entre a massa de dados da raiz e o contrato real esperado pelo backend:
 
-O campo `alerta` pode ser usado no front-end para destacar ocorrencias:
+- o JSON de apoio ainda não está dentro de `backend/src/main/resources`
+- a documentação histórica usava campos como `id_via`, enquanto o backend trabalha com `idvia`
+- o backend atual opera com enums e geometria, o que exige cuidado ao gerar ou importar dados
 
-1. `Normal`: fluxo dentro do esperado
-2. `ANOMALIA`: comportamento fora do padrao esperado para aquele horario
-3. `CONGESTIONAMENTO CRITICO`: via operando em faixa critica de ocupacao
+## Regras de Persistência
 
-## Regras de Persistencia
+Já existe uma regra importante:
 
-Ja existe uma regra importante na API:
+- restrição única em `idvia + hora`
 
-- restricao unica em `idvia + hora`
+Isso evita duplicidade lógica de medições para a mesma via no mesmo horário.
 
-Isso evita duplicidade logica de medicoes para a mesma via no mesmo horario.
+## Recomendações Para Evolução
 
-## Recomendacoes Para Evolucao
-
-- padronizar um contrato unico de dado entre scripts, JSON e entidade Java
-- mover o JSON de carga oficial para `backend/src/main/resources`
-- criar DTO ou mapeador explicito para importacao
-- versionar o schema dos dados caso o motor de simulacao continue evoluindo
+- mover o JSON oficial de carga para `backend/src/main/resources`
+- padronizar definitivamente os nomes de campos entre scripts, JSON e backend
+- versionar o schema do dado de entrada
+- criar validação explícita para importação antes de persistir
