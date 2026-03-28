@@ -155,3 +155,29 @@ classDiagram
 - padronizar erros com `@ControllerAdvice`
 - documentar a API com Swagger/OpenAPI
 - alinhar definitivamente o contrato do JSON de carga com o modelo persistido
+
+## Insights do MVP
+
+### `GET /traffic/insights`
+
+Retorna insights simples para o MVP com base nos registros persistidos.
+
+Resposta atual:
+
+- `totalRegistros`: quantidade total de registros persistidos
+- `horarioPico`: hora com maior soma de volume
+- `volumeHorarioPico`: soma de volume no horario de pico
+- `viaMaisMovimentada`: via com maior media de volume
+- `mediaVolumeViaMaisMovimentada`: media de volume da via mais movimentada
+
+Exemplo:
+
+```json
+{
+  "totalRegistros": 72,
+  "horarioPico": "18:00",
+  "volumeHorarioPico": 1919,
+  "viaMaisMovimentada": "Rodovia do Aeroporto",
+  "mediaVolumeViaMaisMovimentada": 568.46
+}
+```

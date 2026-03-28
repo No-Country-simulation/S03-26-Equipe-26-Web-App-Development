@@ -1,6 +1,7 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.service;
 
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficDataDTO;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.repository.TrafficRepository;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class TrafficService {
@@ -102,5 +105,32 @@ public class TrafficService {
         }
 
         return repository.findAll();
+    }
+
+    public TrafficInsightsResponse getInsights() {
+        List<TrafficData> trafficData = repository.findAll();
+        if (trafficData.isEmpty()) {
+            return new TrafficInsightsResponse(0, "N/D", 0, "N/D", 0.0);
+        }
+
+        Map<String, Integer> volumePorHora = trafficData.stream()
+                .collect(Collectors.groupingBy(TrafficData::getHora, Collectors.summingInt(TrafficData::getVolume)));
+        Map<String, Double> mediaPorVia = trafficData.stream()
+                .collect(Collectors.groupingBy(TrafficData::getNome, Collectors.averagingInt(TrafficData::getVolume)));
+
+        Map.Entry<String, Integer> horarioPico = volumePorHora.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(Map.entry("N/D", 0));
+        Map.Entry<String, Double> viaMaisMovimentada = mediaPorVia.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(Map.entry("N/D", 0.0));
+
+        return new TrafficInsightsResponse(
+                trafficData.size(),
+                horarioPico.getKey(),
+                horarioPico.getValue(),
+                viaMaisMovimentada.getKey(),
+                viaMaisMovimentada.getValue()
+        );
     }
 }
