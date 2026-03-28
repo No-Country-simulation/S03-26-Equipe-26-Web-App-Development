@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(build(HttpStatus.NOT_FOUND, ex.getMessage()));
+                .body(build(HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
     //422 businessException

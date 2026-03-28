@@ -2,6 +2,7 @@ package br.com.smartTrafficFlow.Smart_Traffic_Flow.service;
 
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficDataDTO;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.repository.TrafficRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,7 +71,6 @@ public class TrafficService {
                 }
                 repository.save(entity);
             }
-
         }
     }
 
@@ -83,7 +83,7 @@ public class TrafficService {
         return repository.save(data);
     }
 
-    public List<TrafficData> findByFilters(String clima, Double nivel, String alerta){
+    public List<TrafficData> findByFilters(Climate clima, Double nivel, String alerta){
 
         if (clima != null && nivel != null) {
             return repository.findByClimaAndNivelGreaterThan(clima, nivel);

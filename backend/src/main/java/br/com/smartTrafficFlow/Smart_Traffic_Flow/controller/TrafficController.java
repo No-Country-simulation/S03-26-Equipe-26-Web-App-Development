@@ -1,6 +1,7 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.controller;
 
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.service.TrafficService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class TrafficController {
 
     @GetMapping("/filter")
     public List<TrafficData> filterTraffic(
-            @RequestParam(required = false) String clima,
+            @RequestParam(required = false) Climate clima,
             @RequestParam(required = false) Double nivel,
             @RequestParam(required = false) String alerta) {
 

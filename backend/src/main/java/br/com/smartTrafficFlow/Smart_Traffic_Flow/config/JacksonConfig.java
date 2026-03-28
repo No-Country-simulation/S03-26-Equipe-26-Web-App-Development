@@ -1,4 +1,23 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+
 public class JacksonConfig {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Suporte para LocalDateTime
+        mapper.registerModule(new JavaTimeModule());
+
+        // Não converter datas para timestamp
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        return mapper;
+    }
 }
