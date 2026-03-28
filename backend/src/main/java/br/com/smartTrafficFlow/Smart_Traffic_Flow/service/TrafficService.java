@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -113,21 +114,29 @@ public class TrafficService {
             return new TrafficInsightsResponse(0, "N/D", 0, "N/D", 0.0);
         }
 
-        Map<String, Integer> volumePorHora = trafficData.stream()
-                .collect(Collectors.groupingBy(TrafficData::getHora, Collectors.summingInt(TrafficData::getVolume)));
+        Map< LocalDateTime, Integer> volumePorHora =
+                trafficData.stream()
+                        .collect(Collectors.groupingBy(
+                                TrafficData::getHora,
+                                Collectors.summingInt(TrafficData::getVolume)
+                        ));
+
         Map<String, Double> mediaPorVia = trafficData.stream()
                 .collect(Collectors.groupingBy(TrafficData::getNome, Collectors.averagingInt(TrafficData::getVolume)));
 
-        Map.Entry<String, Integer> horarioPico = volumePorHora.entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .orElse(Map.entry("N/D", 0));
+        Map.Entry<LocalDateTime, Integer> horarioPico =
+                volumePorHora.entrySet().stream()
+                        .max(Map.Entry.comparingByValue())
+                        .orElse(Map.entry(LocalDateTime.MIN, 0));
+
+
         Map.Entry<String, Double> viaMaisMovimentada = mediaPorVia.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .orElse(Map.entry("N/D", 0.0));
 
         return new TrafficInsightsResponse(
                 trafficData.size(),
-                horarioPico.getKey(),
+                horarioPico.getKey().toString(),
                 horarioPico.getValue(),
                 viaMaisMovimentada.getKey(),
                 viaMaisMovimentada.getValue()
