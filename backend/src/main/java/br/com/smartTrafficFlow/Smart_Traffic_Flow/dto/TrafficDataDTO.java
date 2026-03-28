@@ -7,6 +7,8 @@ import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.TypeOfRoute;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class TrafficDataDTO {
@@ -14,7 +16,7 @@ public class TrafficDataDTO {
     private Integer idvia;
     private String nome;
     private TypeOfRoute tipo;
-    private String hora;
+    private LocalDateTime hora;
     private Climate clima;
     private int volume;
     private int capacidade;

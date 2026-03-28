@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -22,22 +24,30 @@ public class TrafficData {
 
     @Column(name = "idvia")
     private Integer idvia;
+
     private String nome;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TypeOfRoute tipo;
-    private String hora;
+
+    private LocalDateTime hora;
+
     @Enumerated(EnumType.STRING)
     private Climate clima;
+
     private int volume;
+
     private int capacidade;
 
     private double nivel;
+
     @Enumerated(EnumType.STRING)
     private StatusTrafego status;
 
     @Enumerated(EnumType.STRING)
     private TrafficAlert alerta;
+
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point geom;
 
