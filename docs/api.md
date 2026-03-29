@@ -1,10 +1,10 @@
-# API
+﻿# API
 
 Este documento concentra os endpoints, comportamento atual e contrato principal do backend.
 
 ## Base URL
 
-Ambiente local padrão:
+Ambiente local padrao:
 
 - `http://localhost:8080`
 
@@ -12,11 +12,11 @@ Base path atual:
 
 - `/traffic`
 
-## Endpoints Disponíveis
+## Endpoints Disponiveis
 
 ### `GET /traffic`
 
-Retorna todos os registros persistidos.
+Retorna todos os registros persistidos em formato simplificado para o frontend.
 
 Exemplo:
 
@@ -26,9 +26,9 @@ curl http://localhost:8080/traffic
 
 ### `GET /traffic/filter`
 
-Filtra registros com base nos parâmetros atualmente suportados pelo backend.
+Filtra registros com base nos parametros atualmente suportados pelo backend.
 
-Parâmetros opcionais:
+Parametros opcionais:
 
 - `clima`
 - `nivel`
@@ -45,7 +45,7 @@ curl "http://localhost:8080/traffic/filter?nivel=70"
 ```
 
 ```bash
-curl "http://localhost:8080/traffic/filter?alerta=CONGESTIONAMENTO_CRITICO"
+curl "http://localhost:8080/traffic/filter?alerta=ANOMALIA"
 ```
 
 Comportamento atual:
@@ -54,7 +54,7 @@ Comportamento atual:
 - se apenas `clima` for enviado, usa `findByClima(...)`
 - se apenas `nivel` for enviado, usa `findByNivelGreaterThan(...)`
 - se apenas `alerta` for enviado, usa `findByAlerta(...)`
-- sem parâmetros, retorna todos os registros
+- sem parametros, retorna todos os registros
 
 ### `POST /traffic`
 
@@ -67,38 +67,38 @@ Payload de exemplo:
   "idvia": 1,
   "nome": "Av. Central",
   "tipo": "ARTERIAL",
-  "hora": "08:00",
+  "hora": "2026-03-28T08:00:00",
   "clima": "LIMPO",
   "volume": 920,
   "capacidade": 1000,
   "nivel": 92.0,
-  "status": "CRITICO",
-  "alerta": "CONGESTIONAMENTO_CRITICO"
+  "status": "CONGESTIONADO",
+  "alerta": "CRITICO"
 }
 ```
 
-Observações:
+Observacoes:
 
-- o backend hoje trabalha com enums para `tipo`, `clima`, `status` e `alerta`
-- a entidade persistida também possui `geom`, embora esse campo não apareça naturalmente no exemplo simples acima
+- o backend trabalha com enums para `tipo`, `clima`, `status` e `alerta`
+- a entidade persistida tambem possui `geom`, mas os endpoints de listagem e filtro nao expõem esse objeto bruto
 
 ### `POST /traffic/load`
 
-Tenta carregar dados de um arquivo JSON e persistí-los evitando duplicidade por `idvia + hora`.
+Tenta carregar dados de um arquivo JSON e persisti-los evitando duplicidade por `idvia + hora`.
 
 Fluxo implementado:
 
 1. o controller chama `TrafficService.loadData()`
-2. o service lê `traffic_data.json` do classpath em uma lista de `TrafficDataDTO`
-3. cada DTO é convertido para `TrafficData`
-4. `lat/lng` são convertidos em `Point`
-5. o registro só é salvo se `existsByIdviaAndHora(...)` retornar falso
+2. o service le `traffic_data.json` do classpath em uma lista de `TrafficDataDTO`
+3. cada DTO e convertido para `TrafficData`
+4. `lat/lng` sao convertidos em `Point`
+5. o registro so e salvo se `existsByIdviaAndHora(...)` retornar falso
 
 Estado atual:
 
-- a implementação existe
-- o arquivo JSON exigido por esse fluxo ainda não está em `backend/src/main/resources`
-- na prática, a carga inicial operacional continua acontecendo via `import.sql`
+- a implementacao existe
+- o arquivo JSON exigido por esse fluxo ainda nao esta em `backend/src/main/resources`
+- na pratica, a carga inicial operacional continua acontecendo via `import.sql`
 
 ## Fluxo de Consulta
 
@@ -116,7 +116,7 @@ sequenceDiagram
     Repo->>DB: SELECT com filtros
     DB-->>Repo: registros
     Repo-->>Service: List<TrafficData>
-    Service-->>Controller: List<TrafficData>
+    Service-->>Controller: List<TrafficResponse>
     Controller-->>Client: 200 OK + JSON
 ```
 
@@ -129,7 +129,7 @@ classDiagram
         +Integer idvia
         +String nome
         +TypeOfRoute tipo
-        +String hora
+        +LocalDateTime hora
         +Climate clima
         +int volume
         +int capacidade
@@ -140,21 +140,13 @@ classDiagram
     }
 ```
 
-## Dependências Relevantes do Backend
+## Dependencias Relevantes do Backend
 
 - Spring Boot Web
 - Spring Data JPA
 - H2
 - Hibernate Spatial
 - H2GIS
-
-## Melhorias Recomendadas
-
-- adicionar DTOs de response e não expor diretamente a entidade
-- incluir Bean Validation nas entradas
-- padronizar erros com `@ControllerAdvice`
-- documentar a API com Swagger/OpenAPI
-- alinhar definitivamente o contrato do JSON de carga com o modelo persistido
 
 ## Insights do MVP
 
@@ -175,7 +167,7 @@ Exemplo:
 ```json
 {
   "totalRegistros": 72,
-  "horarioPico": "18:00",
+  "horarioPico": "2026-03-28T18:00:00",
   "volumeHorarioPico": 1919,
   "viaMaisMovimentada": "Rodovia do Aeroporto",
   "mediaVolumeViaMaisMovimentada": 568.46
@@ -186,9 +178,9 @@ Exemplo:
 
 ### Resposta simplificada de `GET /traffic` e `GET /traffic/filter`
 
-Os endpoints de listagem e filtro passaram a retornar um payload simplificado para facilitar o consumo no frontend.
+Os endpoints de listagem e filtro retornam um payload simplificado para facilitar o consumo no frontend.
 
-A resposta nao exp�e mais o objeto bruto de `geom`.
+A resposta nao expoe mais o objeto bruto de `geom`.
 Quando houver localizacao, o backend retorna apenas:
 
 - `lat`
@@ -223,4 +215,4 @@ O endpoint `GET /traffic/filter?alerta=ANOMALIA` passa a usar o tipo correto do 
 Com isso:
 
 - o filtro deixa de depender de comparacao incorreta por `String`
-- valores invalidos de alerta devem ser tratados como erro de requisicao
+- valores invalidos de alerta passam a ser tratados como erro de requisicao
