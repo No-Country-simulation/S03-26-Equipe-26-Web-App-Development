@@ -1,0 +1,53 @@
+package br.com.smartTrafficFlow.Smart_Traffic_Flow.controller;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class TrafficControllerIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    void shouldReturnTrafficList() throws Exception {
+        mockMvc.perform(get("/traffic"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"idvia\":1")))
+                .andExpect(content().string(containsString("\"nome\":\"Av. Central\"")))
+                .andExpect(content().string(containsString("\"tipo\":\"arterial\"")));
+    }
+
+    @Test
+    void shouldFilterTrafficByLevel() throws Exception {
+        mockMvc.perform(get("/traffic/filter").param("nivel", "40"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"nivel\":45.0")))
+                .andExpect(content().string(not(containsString("\"nivel\":20.2"))));
+    }
+
+    @Test
+    void shouldReturnTrafficInsights() throws Exception {
+        mockMvc.perform(get("/traffic/insights"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalRegistros", greaterThan(0)))
+                .andExpect(jsonPath("$.horarioPico", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.volumeHorarioPico", greaterThan(0)))
+                .andExpect(jsonPath("$.viaMaisMovimentada", not(emptyOrNullString())))
+                .andExpect(jsonPath("$.mediaVolumeViaMaisMovimentada", greaterThanOrEqualTo(0.0)));
+    }
+}
