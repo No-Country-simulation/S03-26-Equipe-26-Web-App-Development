@@ -2,8 +2,11 @@ package br.com.smartTrafficFlow.Smart_Traffic_Flow.service;
 
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficDataDTO;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.TrafficAlert;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.exception.BadRequestException;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.repository.TrafficRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -78,34 +81,35 @@ public class TrafficService {
         }
     }
 
-    public List<TrafficData> getAll(){
-
-        return repository.findAll();
+    public List<TrafficResponse> getAll(){
+        return repository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public TrafficData save(TrafficData data){
         return repository.save(data);
     }
 
-    public List<TrafficData> findByFilters(Climate clima, Double nivel, String alerta){
+    public List<TrafficResponse> findByFilters(Climate clima, Double nivel, String alerta){
+        TrafficAlert parsedAlert = parseAlert(alerta);
+        List<TrafficData> result;
 
         if (clima != null && nivel != null) {
-            return repository.findByClimaAndNivelGreaterThan(clima, nivel);
+            result = repository.findByClimaAndNivelGreaterThan(clima, nivel);
+        } else if (clima != null) {
+            result = repository.findByClima(clima);
+        } else if (nivel != null) {
+            result = repository.findByNivelGreaterThan(nivel);
+        } else if (parsedAlert != null) {
+            result = repository.findByAlerta(parsedAlert);
+        } else {
+            result = repository.findAll();
         }
 
-        if (clima != null) {
-            return repository.findByClima(clima);
-        }
-
-        if (nivel != null) {
-            return repository.findByNivelGreaterThan(nivel);
-        }
-
-        if (alerta != null) {
-            return repository.findByAlerta(alerta);
-        }
-
-        return repository.findAll();
+        return result.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public TrafficInsightsResponse getInsights() {
@@ -140,6 +144,39 @@ public class TrafficService {
                 horarioPico.getValue(),
                 viaMaisMovimentada.getKey(),
                 viaMaisMovimentada.getValue()
+        );
+    }
+
+    private TrafficAlert parseAlert(String alerta) {
+        if (alerta == null || alerta.isBlank()) {
+            return null;
+        }
+
+        try {
+            return TrafficAlert.valueOf(alerta.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException("Parametro alerta invalido");
+        }
+    }
+
+    private TrafficResponse toResponse(TrafficData entity) {
+        Double lat = entity.getGeom() == null ? null : entity.getGeom().getY();
+        Double lng = entity.getGeom() == null ? null : entity.getGeom().getX();
+
+        return new TrafficResponse(
+                entity.getId(),
+                entity.getIdvia(),
+                entity.getNome(),
+                entity.getTipo(),
+                entity.getHora(),
+                entity.getClima(),
+                entity.getVolume(),
+                entity.getCapacidade(),
+                entity.getNivel(),
+                entity.getStatus(),
+                entity.getAlerta(),
+                lat,
+                lng
         );
     }
 }

@@ -29,7 +29,10 @@ class TrafficControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"idvia\":1")))
                 .andExpect(content().string(containsString("\"nome\":\"Av. Central\"")))
-                .andExpect(content().string(containsString("\"tipo\":\"arterial\"")));
+                .andExpect(content().string(containsString("\"tipo\":\"arterial\"")))
+                .andExpect(content().string(containsString("\"lat\":-23.5505")))
+                .andExpect(content().string(containsString("\"lng\":-46.6333")))
+                .andExpect(content().string(not(containsString("\"envelope\""))));
     }
 
     @Test
@@ -38,6 +41,14 @@ class TrafficControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"nivel\":45.0")))
                 .andExpect(content().string(not(containsString("\"nivel\":20.2"))));
+    }
+
+    @Test
+    void shouldFilterTrafficByAlert() throws Exception {
+        mockMvc.perform(get("/traffic/filter").param("alerta", "ANOMALIA"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"alerta\":\"ANOMALIA\"")))
+                .andExpect(content().string(not(containsString("\"alerta\":\"NORMAL\""))));
     }
 
     @Test

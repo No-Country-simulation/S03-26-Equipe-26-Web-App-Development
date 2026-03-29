@@ -181,3 +181,46 @@ Exemplo:
   "mediaVolumeViaMaisMovimentada": 568.46
 }
 ```
+
+## Ajustes da API de trafego
+
+### Resposta simplificada de `GET /traffic` e `GET /traffic/filter`
+
+Os endpoints de listagem e filtro passaram a retornar um payload simplificado para facilitar o consumo no frontend.
+
+A resposta nao expõe mais o objeto bruto de `geom`.
+Quando houver localizacao, o backend retorna apenas:
+
+- `lat`
+- `lng`
+
+Exemplo:
+
+```json
+[
+  {
+    "id": 1,
+    "idvia": 1,
+    "nome": "Av. Central",
+    "tipo": "ARTERIAL",
+    "hora": "2026-03-28T00:00:00",
+    "clima": null,
+    "volume": 202,
+    "capacidade": 1000,
+    "nivel": 20.2,
+    "status": null,
+    "alerta": "NORMAL",
+    "lat": -23.5505,
+    "lng": -46.6333
+  }
+]
+```
+
+### Filtro por alerta
+
+O endpoint `GET /traffic/filter?alerta=ANOMALIA` passa a usar o tipo correto do dominio no backend.
+
+Com isso:
+
+- o filtro deixa de depender de comparacao incorreta por `String`
+- valores invalidos de alerta devem ser tratados como erro de requisicao

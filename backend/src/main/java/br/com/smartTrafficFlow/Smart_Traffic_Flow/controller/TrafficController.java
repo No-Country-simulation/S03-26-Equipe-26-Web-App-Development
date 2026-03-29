@@ -1,6 +1,7 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.controller;
 
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.service.TrafficService;
@@ -30,7 +31,7 @@ public class TrafficController {
     }
 
     @GetMapping
-    public List<TrafficData> getAll(){
+    public List<TrafficResponse> getAll(){
         return service.getAll();
     }
 
@@ -41,7 +42,7 @@ public class TrafficController {
     }
 
     @GetMapping("/filter")
-    public List<TrafficData> filterTraffic(
+    public List<TrafficResponse> filterTraffic(
             @RequestParam(required = false) Climate clima,
             @RequestParam(required = false) Double nivel,
             @RequestParam(required = false) String alerta) {
