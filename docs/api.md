@@ -1,10 +1,10 @@
-﻿# API
+# API
 
-Este documento concentra os endpoints, comportamento atual e contrato principal do backend.
+Este documento concentra os endpoints, o comportamento atual e o contrato principal do backend.
 
 ## Base URL
 
-Ambiente local padrao:
+Ambiente local padrão:
 
 - `http://localhost:8080`
 
@@ -12,7 +12,7 @@ Base path atual:
 
 - `/traffic`
 
-## Endpoints Disponiveis
+## Endpoints Disponíveis
 
 ### `GET /traffic`
 
@@ -26,9 +26,9 @@ curl http://localhost:8080/traffic
 
 ### `GET /traffic/filter`
 
-Filtra registros com base nos parametros atualmente suportados pelo backend.
+Filtra registros com base nos parâmetros atualmente suportados pelo backend.
 
-Parametros opcionais:
+Parâmetros opcionais:
 
 - `clima`
 - `nivel`
@@ -54,7 +54,7 @@ Comportamento atual:
 - se apenas `clima` for enviado, usa `findByClima(...)`
 - se apenas `nivel` for enviado, usa `findByNivelGreaterThan(...)`
 - se apenas `alerta` for enviado, usa `findByAlerta(...)`
-- sem parametros, retorna todos os registros
+- sem parâmetros, retorna todos os registros
 
 ### `POST /traffic`
 
@@ -77,10 +77,10 @@ Payload de exemplo:
 }
 ```
 
-Observacoes:
+Observações:
 
 - o backend trabalha com enums para `tipo`, `clima`, `status` e `alerta`
-- a entidade persistida tambem possui `geom`, mas os endpoints de listagem e filtro nao expõem esse objeto bruto
+- a entidade persistida também possui `geom`, mas os endpoints de listagem e filtro não expõem esse objeto bruto
 
 ### `POST /traffic/load`
 
@@ -89,16 +89,40 @@ Tenta carregar dados de um arquivo JSON e persisti-los evitando duplicidade por 
 Fluxo implementado:
 
 1. o controller chama `TrafficService.loadData()`
-2. o service le `traffic_data.json` do classpath em uma lista de `TrafficDataDTO`
-3. cada DTO e convertido para `TrafficData`
-4. `lat/lng` sao convertidos em `Point`
-5. o registro so e salvo se `existsByIdviaAndHora(...)` retornar falso
+2. o service lê `traffic_data.json` do classpath em uma lista de `TrafficDataDTO`
+3. cada DTO é convertido para `TrafficData`
+4. `lat/lng` são convertidos em `Point`
+5. o registro só é salvo se `existsByIdviaAndHora(...)` retornar falso
 
 Estado atual:
 
-- a implementacao existe
-- o arquivo JSON exigido por esse fluxo ainda nao esta em `backend/src/main/resources`
-- na pratica, a carga inicial operacional continua acontecendo via `import.sql`
+- a implementação existe
+- o arquivo JSON exigido por esse fluxo ainda não está em `backend/src/main/resources`
+- na prática, a carga inicial operacional continua acontecendo via `import.sql`
+
+### `GET /traffic/insights`
+
+Retorna insights simples para o MVP com base nos registros persistidos.
+
+Resposta atual:
+
+- `totalRegistros`: quantidade total de registros persistidos
+- `horarioPico`: hora com maior soma de volume
+- `volumeHorarioPico`: soma de volume no horário de pico
+- `viaMaisMovimentada`: via com maior média de volume
+- `mediaVolumeViaMaisMovimentada`: média de volume da via mais movimentada
+
+Exemplo:
+
+```json
+{
+  "totalRegistros": 72,
+  "horarioPico": "2026-03-28T18:00:00",
+  "volumeHorarioPico": 1919,
+  "viaMaisMovimentada": "Rodovia do Aeroporto",
+  "mediaVolumeViaMaisMovimentada": 568.46
+}
+```
 
 ## Fluxo de Consulta
 
@@ -140,48 +164,11 @@ classDiagram
     }
 ```
 
-## Dependencias Relevantes do Backend
+## Resposta Simplificada da API
 
-- Spring Boot Web
-- Spring Data JPA
-- H2
-- Hibernate Spatial
-- H2GIS
+Os endpoints `GET /traffic` e `GET /traffic/filter` retornam um payload simplificado para facilitar o consumo no frontend.
 
-## Insights do MVP
-
-### `GET /traffic/insights`
-
-Retorna insights simples para o MVP com base nos registros persistidos.
-
-Resposta atual:
-
-- `totalRegistros`: quantidade total de registros persistidos
-- `horarioPico`: hora com maior soma de volume
-- `volumeHorarioPico`: soma de volume no horario de pico
-- `viaMaisMovimentada`: via com maior media de volume
-- `mediaVolumeViaMaisMovimentada`: media de volume da via mais movimentada
-
-Exemplo:
-
-```json
-{
-  "totalRegistros": 72,
-  "horarioPico": "2026-03-28T18:00:00",
-  "volumeHorarioPico": 1919,
-  "viaMaisMovimentada": "Rodovia do Aeroporto",
-  "mediaVolumeViaMaisMovimentada": 568.46
-}
-```
-
-## Ajustes da API de trafego
-
-### Resposta simplificada de `GET /traffic` e `GET /traffic/filter`
-
-Os endpoints de listagem e filtro retornam um payload simplificado para facilitar o consumo no frontend.
-
-A resposta nao expoe mais o objeto bruto de `geom`.
-Quando houver localizacao, o backend retorna apenas:
+A resposta não expõe mais o objeto bruto de `geom`. Quando houver localização, o backend retorna apenas:
 
 - `lat`
 - `lng`
@@ -208,11 +195,19 @@ Exemplo:
 ]
 ```
 
-### Filtro por alerta
+## Filtro por Alerta
 
-O endpoint `GET /traffic/filter?alerta=ANOMALIA` passa a usar o tipo correto do dominio no backend.
+O endpoint `GET /traffic/filter?alerta=ANOMALIA` usa o tipo correto do domínio no backend.
 
 Com isso:
 
-- o filtro deixa de depender de comparacao incorreta por `String`
-- valores invalidos de alerta passam a ser tratados como erro de requisicao
+- o filtro deixa de depender de comparação incorreta por `String`
+- valores inválidos de alerta passam a ser tratados como erro de requisição
+
+## Dependências Relevantes do Backend
+
+- Spring Boot Web
+- Spring Data JPA
+- H2
+- Hibernate Spatial
+- H2GIS

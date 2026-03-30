@@ -1,23 +1,24 @@
 # Smart Traffic Flow
 
-Aplicação full stack para simulação, visualização e consulta de dados de tráfego urbano. O projeto hoje combina um backend em Spring Boot com um frontend em React/Vite, e a documentação foi organizada por domínio para continuar escalando conforme novas features entrarem.
+Aplicação full stack para simulação, visualização e consulta de dados de tráfego urbano. O projeto combina um backend em Spring Boot com um frontend em React/Vite, usando um dataset simulado pela equipe para explorar padrões básicos de mobilidade urbana.
 
 ## Visão Geral
 
 O estado atual do projeto inclui:
 
 - backend REST em Spring Boot para carga, persistência e consulta de dados de tráfego
-- frontend em React com tela inicial e mapa interativo baseado em Leaflet
+- endpoint de insights para o MVP em `GET /traffic/insights`
 - persistência em H2 em memória no backend
 - carga inicial automática via `import.sql`
+- testes de integração básicos para os principais endpoints do MVP
 - documentação modular separada por API, dados e frontend
 
 Limitações atuais conhecidas:
 
 - `POST /traffic/load` depende de `traffic_data.json` no classpath e esse arquivo ainda não está em `backend/src/main/resources`
 - o frontend ainda está em fase inicial e não mostra integração explícita com a API nas telas atuais
-- `leaflet` e `leaflet/dist/leaflet.css` são usados no frontend, mas essa dependência não aparece declarada em `frontend/package.json`
-- ainda não há padronização completa de erros, autenticação nem suíte robusta de testes
+- o mapa com Leaflet permanece como melhoria futura e não faz parte do fluxo principal do MVP
+- ainda não há autenticação nem uma suíte completa de testes além da cobertura básica do backend
 
 ## Stack
 
@@ -43,9 +44,9 @@ Limitações atuais conhecidas:
 
 O repositório segue uma estrutura de documentação modular:
 
-- [API](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/api.md)
-- [Dados](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/dados.md)
-- [Frontend](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/frontend.md)
+- [API](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/api.md)
+- [Dados](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/dados.md)
+- [Frontend](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/docs/frontend.md)
 
 ## Arquitetura
 
@@ -57,16 +58,16 @@ flowchart LR
     subgraph API["Backend Spring Boot"]
         C -->|POST /traffic/load| S[TrafficService]
         C -->|GET /traffic| S
-        C -->|POST /traffic| S
         C -->|GET /traffic/filter| S
+        C -->|GET /traffic/insights| S
+        C -->|POST /traffic| S
 
-        S -->|JSON -> DTO -> Entity| M[Mapper no service]
+        S -->|JSON -> DTO -> Entity| M[Mapeamento no service]
         S -->|save / findAll / filtros| R[TrafficRepository]
         S -->|loadFromJson| J[(traffic_data.json)]
         R --> D[(H2 + Spatial<br/>traffic_data)]
     end
 
-    F --> L[Leaflet + OpenStreetMap]
     D -. carga inicial .-> SQL[(import.sql)]
 ```
 
@@ -136,6 +137,18 @@ Frontend Vite disponível por padrão em:
 
 - `http://localhost:5173`
 
+## Status do MVP
+
+Entregas já implementadas no backend:
+
+- `GET /traffic`
+- `GET /traffic/filter`
+- `POST /traffic`
+- `POST /traffic/load`
+- `GET /traffic/insights`
+- payload simplificado com `lat` e `lng` para consumo no frontend
+- testes de integração cobrindo endpoints principais do MVP
+
 ## Roadmap de Documentação
 
 Sempre que o projeto evoluir, atualizar pelo menos:
@@ -147,15 +160,17 @@ Sempre que o projeto evoluir, atualizar pelo menos:
 
 ## Referências do Código
 
-- [TrafficController.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/controller/TrafficController.java)
-- [TrafficService.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/service/TrafficService.java)
-- [TrafficData.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/entity/TrafficData.java)
-- [TrafficDataDTO.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/dto/TrafficDataDTO.java)
-- [Home.jsx](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/src/pages/home/Home.jsx)
-- [package.json](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/package.json)
+- [TrafficController.java](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/controller/TrafficController.java)
+- [TrafficService.java](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/service/TrafficService.java)
+- [TrafficData.java](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/entity/TrafficData.java)
+- [TrafficDataDTO.java](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/dto/TrafficDataDTO.java)
+- [TrafficResponse.java](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/dto/TrafficResponse.java)
+- [TrafficControllerIntegrationTest.java](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/test/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/controller/TrafficControllerIntegrationTest.java)
+- [Home.jsx](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/src/pages/home/Home.jsx)
+- [package.json](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/package.json)
 
 ## Licença
 
 Este projeto está licenciado sob a MIT License.
 
-Consulte [LICENSE](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/LICENSE).
+Consulte [LICENSE](/C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/LICENSE).
