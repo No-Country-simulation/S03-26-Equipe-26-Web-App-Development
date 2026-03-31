@@ -122,6 +122,8 @@ No Windows PowerShell:
 Backend disponível por padrão em:
 
 - API: `http://localhost:8080`
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 - Console H2: `http://localhost:8080/h2-console`
 
 ### Frontend

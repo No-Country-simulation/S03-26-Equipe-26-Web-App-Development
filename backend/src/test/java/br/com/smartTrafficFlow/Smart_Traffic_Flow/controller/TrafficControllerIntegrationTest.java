@@ -61,4 +61,19 @@ class TrafficControllerIntegrationTest {
                 .andExpect(jsonPath("$.viaMaisMovimentada", not(emptyOrNullString())))
                 .andExpect(jsonPath("$.mediaVolumeViaMaisMovimentada", greaterThanOrEqualTo(0.0)));
     }
+
+    @Test
+    void shouldExposeOpenApiDocument() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"title\":\"Smart Traffic Flow API\"")))
+                .andExpect(content().string(containsString("\"/traffic\"")))
+                .andExpect(content().string(containsString("\"/traffic/insights\"")));
+    }
+
+    @Test
+    void shouldExposeSwaggerUi() throws Exception {
+        mockMvc.perform(get("/swagger-ui/index.html"))
+                .andExpect(status().isOk());
+    }
 }
