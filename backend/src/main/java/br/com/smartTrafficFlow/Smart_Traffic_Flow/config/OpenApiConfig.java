@@ -19,7 +19,7 @@ public class OpenApiConfig {
                         .version("v1")
                         .contact(new Contact()
                                 .name("Equipe Smart Traffic Flow")
-                                .url("https://github.com"))
+                                .url("https://github.com/No-Country-simulation/S03-26-Equipe-26-Web-App-Development"))
                         .license(new License()
                                 .name("MIT")));
     }
