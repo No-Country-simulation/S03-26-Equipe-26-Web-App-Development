@@ -2,6 +2,7 @@ package br.com.smartTrafficFlow.Smart_Traffic_Flow.repository;
 
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.TrafficAlert;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
@@ -17,5 +18,5 @@ public interface TrafficRepository extends JpaRepository<TrafficData, Long> {
 
     List<TrafficData> findByNivelGreaterThan(Double nivel);
 
-    List<TrafficData> findByAlerta(String alerta);
+    List<TrafficData> findByAlerta(TrafficAlert alerta);
 }

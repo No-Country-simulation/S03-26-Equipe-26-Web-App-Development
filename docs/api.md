@@ -1,6 +1,6 @@
 # API
 
-Este documento concentra os endpoints, comportamento atual e contrato principal do backend.
+Este documento concentra os endpoints, o comportamento atual e o contrato principal do backend.
 
 ## Base URL
 
@@ -16,7 +16,7 @@ Base path atual:
 
 ### `GET /traffic`
 
-Retorna todos os registros persistidos.
+Retorna todos os registros persistidos em formato simplificado para o frontend.
 
 Exemplo:
 
@@ -45,7 +45,7 @@ curl "http://localhost:8080/traffic/filter?nivel=70"
 ```
 
 ```bash
-curl "http://localhost:8080/traffic/filter?alerta=CONGESTIONAMENTO_CRITICO"
+curl "http://localhost:8080/traffic/filter?alerta=ANOMALIA"
 ```
 
 Comportamento atual:
@@ -67,24 +67,24 @@ Payload de exemplo:
   "idvia": 1,
   "nome": "Av. Central",
   "tipo": "ARTERIAL",
-  "hora": "08:00",
+  "hora": "2026-03-28T08:00:00",
   "clima": "LIMPO",
   "volume": 920,
   "capacidade": 1000,
   "nivel": 92.0,
-  "status": "CRITICO",
-  "alerta": "CONGESTIONAMENTO_CRITICO"
+  "status": "CONGESTIONADO",
+  "alerta": "CRITICO"
 }
 ```
 
 Observações:
 
-- o backend hoje trabalha com enums para `tipo`, `clima`, `status` e `alerta`
-- a entidade persistida também possui `geom`, embora esse campo não apareça naturalmente no exemplo simples acima
+- o backend trabalha com enums para `tipo`, `clima`, `status` e `alerta`
+- a entidade persistida também possui `geom`, mas os endpoints de listagem e filtro não expõem esse objeto bruto
 
 ### `POST /traffic/load`
 
-Tenta carregar dados de um arquivo JSON e persistí-los evitando duplicidade por `idvia + hora`.
+Tenta carregar dados de um arquivo JSON e persisti-los evitando duplicidade por `idvia + hora`.
 
 Fluxo implementado:
 
@@ -99,6 +99,30 @@ Estado atual:
 - a implementação existe
 - o arquivo JSON exigido por esse fluxo ainda não está em `backend/src/main/resources`
 - na prática, a carga inicial operacional continua acontecendo via `import.sql`
+
+### `GET /traffic/insights`
+
+Retorna insights simples para o MVP com base nos registros persistidos.
+
+Resposta atual:
+
+- `totalRegistros`: quantidade total de registros persistidos
+- `horarioPico`: hora com maior soma de volume
+- `volumeHorarioPico`: soma de volume no horário de pico
+- `viaMaisMovimentada`: via com maior média de volume
+- `mediaVolumeViaMaisMovimentada`: média de volume da via mais movimentada
+
+Exemplo:
+
+```json
+{
+  "totalRegistros": 72,
+  "horarioPico": "2026-03-28T18:00:00",
+  "volumeHorarioPico": 1919,
+  "viaMaisMovimentada": "Rodovia do Aeroporto",
+  "mediaVolumeViaMaisMovimentada": 568.46
+}
+```
 
 ## Fluxo de Consulta
 
@@ -116,7 +140,7 @@ sequenceDiagram
     Repo->>DB: SELECT com filtros
     DB-->>Repo: registros
     Repo-->>Service: List<TrafficData>
-    Service-->>Controller: List<TrafficData>
+    Service-->>Controller: List<TrafficResponse>
     Controller-->>Client: 200 OK + JSON
 ```
 
@@ -129,7 +153,7 @@ classDiagram
         +Integer idvia
         +String nome
         +TypeOfRoute tipo
-        +String hora
+        +LocalDateTime hora
         +Climate clima
         +int volume
         +int capacidade
@@ -140,6 +164,46 @@ classDiagram
     }
 ```
 
+## Resposta Simplificada da API
+
+Os endpoints `GET /traffic` e `GET /traffic/filter` retornam um payload simplificado para facilitar o consumo no frontend.
+
+A resposta não expõe mais o objeto bruto de `geom`. Quando houver localização, o backend retorna apenas:
+
+- `lat`
+- `lng`
+
+Exemplo:
+
+```json
+[
+  {
+    "id": 1,
+    "idvia": 1,
+    "nome": "Av. Central",
+    "tipo": "ARTERIAL",
+    "hora": "2026-03-28T00:00:00",
+    "clima": null,
+    "volume": 202,
+    "capacidade": 1000,
+    "nivel": 20.2,
+    "status": null,
+    "alerta": "NORMAL",
+    "lat": -23.5505,
+    "lng": -46.6333
+  }
+]
+```
+
+## Filtro por Alerta
+
+O endpoint `GET /traffic/filter?alerta=ANOMALIA` usa o tipo correto do domínio no backend.
+
+Com isso:
+
+- o filtro deixa de depender de comparação incorreta por `String`
+- valores inválidos de alerta passam a ser tratados como erro de requisição
+
 ## Dependências Relevantes do Backend
 
 - Spring Boot Web
@@ -147,37 +211,3 @@ classDiagram
 - H2
 - Hibernate Spatial
 - H2GIS
-
-## Melhorias Recomendadas
-
-- adicionar DTOs de response e não expor diretamente a entidade
-- incluir Bean Validation nas entradas
-- padronizar erros com `@ControllerAdvice`
-- documentar a API com Swagger/OpenAPI
-- alinhar definitivamente o contrato do JSON de carga com o modelo persistido
-
-## Insights do MVP
-
-### `GET /traffic/insights`
-
-Retorna insights simples para o MVP com base nos registros persistidos.
-
-Resposta atual:
-
-- `totalRegistros`: quantidade total de registros persistidos
-- `horarioPico`: hora com maior soma de volume
-- `volumeHorarioPico`: soma de volume no horario de pico
-- `viaMaisMovimentada`: via com maior media de volume
-- `mediaVolumeViaMaisMovimentada`: media de volume da via mais movimentada
-
-Exemplo:
-
-```json
-{
-  "totalRegistros": 72,
-  "horarioPico": "18:00",
-  "volumeHorarioPico": 1919,
-  "viaMaisMovimentada": "Rodovia do Aeroporto",
-  "mediaVolumeViaMaisMovimentada": 568.46
-}
-```

@@ -29,7 +29,10 @@ class TrafficControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"idvia\":1")))
                 .andExpect(content().string(containsString("\"nome\":\"Av. Central\"")))
-                .andExpect(content().string(containsString("\"tipo\":\"arterial\"")));
+                .andExpect(content().string(containsString("\"tipo\":\"arterial\"")))
+                .andExpect(content().string(containsString("\"lat\":-23.5505")))
+                .andExpect(content().string(containsString("\"lng\":-46.6333")))
+                .andExpect(content().string(not(containsString("\"envelope\""))));
     }
 
     @Test
@@ -41,6 +44,14 @@ class TrafficControllerIntegrationTest {
     }
 
     @Test
+    void shouldFilterTrafficByAlert() throws Exception {
+        mockMvc.perform(get("/traffic/filter").param("alerta", "ANOMALIA"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"alerta\":\"ANOMALIA\"")))
+                .andExpect(content().string(not(containsString("\"alerta\":\"NORMAL\""))));
+    }
+
+    @Test
     void shouldReturnTrafficInsights() throws Exception {
         mockMvc.perform(get("/traffic/insights"))
                 .andExpect(status().isOk())
@@ -49,5 +60,20 @@ class TrafficControllerIntegrationTest {
                 .andExpect(jsonPath("$.volumeHorarioPico", greaterThan(0)))
                 .andExpect(jsonPath("$.viaMaisMovimentada", not(emptyOrNullString())))
                 .andExpect(jsonPath("$.mediaVolumeViaMaisMovimentada", greaterThanOrEqualTo(0.0)));
+    }
+
+    @Test
+    void shouldExposeOpenApiDocument() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("\"title\":\"Smart Traffic Flow API\"")))
+                .andExpect(content().string(containsString("\"/traffic\"")))
+                .andExpect(content().string(containsString("\"/traffic/insights\"")));
+    }
+
+    @Test
+    void shouldExposeSwaggerUi() throws Exception {
+        mockMvc.perform(get("/swagger-ui/index.html"))
+                .andExpect(status().isOk());
     }
 }

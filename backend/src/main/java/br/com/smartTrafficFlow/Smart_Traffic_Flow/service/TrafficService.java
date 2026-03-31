@@ -4,6 +4,7 @@ import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficDataDTO;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.TrafficAlert;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.repository.TrafficRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,6 +90,16 @@ public class TrafficService {
 
     public List<TrafficData> findByFilters(Climate clima, Double nivel, String alerta){
 
+        if (alerta != null && !alerta.trim().isEmpty()) {
+            try {
+                TrafficAlert alertaEnum = TrafficAlert.valueOf(alerta.toUpperCase());
+                return repository.findByAlerta(alertaEnum);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Aviso: Alerta '" + alerta + "' não encontrado no Enum TrafficAlert.");
+                // Se o alerta for inválido, podemos optar por ignorar o filtro de alerta e seguir para os outros
+            }
+        }
+
         if (clima != null && nivel != null) {
             return repository.findByClimaAndNivelGreaterThan(clima, nivel);
         }
@@ -99,10 +110,6 @@ public class TrafficService {
 
         if (nivel != null) {
             return repository.findByNivelGreaterThan(nivel);
-        }
-
-        if (alerta != null) {
-            return repository.findByAlerta(alerta);
         }
 
         return repository.findAll();
