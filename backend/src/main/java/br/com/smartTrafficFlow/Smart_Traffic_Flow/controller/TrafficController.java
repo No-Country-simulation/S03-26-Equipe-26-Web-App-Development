@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -31,7 +30,6 @@ public class TrafficController {
     public TrafficController(TrafficService service) {
         this.service = service;
     }
-
     @PostMapping("/load")
     @Operation(
             summary = "Carrega dados de trafego do arquivo JSON",
@@ -57,10 +55,7 @@ public class TrafficController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = TrafficResponse.class)))
     )
     public List<TrafficResponse> getAll(){
-        return service.getAll()
-                .stream()
-                .map(this::convertToResponse)
-                .toList();
+        return service.getAll();
     }
 
     @PostMapping
@@ -96,11 +91,7 @@ public class TrafficController {
             @Parameter(description = "Alerta de trafego", example = "ANOMALIA")
             @RequestParam(required = false) String alerta) {
 
-        return service.findByFilters(clima, nivel, alerta)
-                .stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
-
+        return service.findByFilters(clima, nivel, alerta);
     }
 
     @GetMapping("/insights")
@@ -116,32 +107,5 @@ public class TrafficController {
     public TrafficInsightsResponse getInsights() {
         return service.getInsights();
     }
-
-    private TrafficResponse convertToResponse(TrafficData traffic) {
-        Double lat = null;
-        Double lng = null;
-
-        if (traffic.getGeom() != null){
-            lng = traffic.getGeom().getX();
-            lat = traffic.getGeom().getY();
-        }
-
-        return new TrafficResponse(
-                traffic.getId(),
-                traffic.getIdvia(),
-                traffic.getNome(),
-                traffic.getTipo(),
-                traffic.getHora(),
-                traffic.getClima(),
-                traffic.getVolume(),
-                traffic.getCapacidade(),
-                traffic.getNivel(),
-                traffic.getStatus(),
-                traffic.getAlerta(),
-                lat,
-                lng
-        );
-    }
-
 
 }

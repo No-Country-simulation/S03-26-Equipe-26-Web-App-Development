@@ -4,6 +4,7 @@ import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.StatusTrafego;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.TrafficAlert;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.TypeOfRoute;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -65,4 +66,14 @@ public class TrafficData {
     @Schema(description = "Geometria espacial interna usada pelo backend", hidden = true)
     private Point geom;
 
+    @JsonIgnore
+    public Double getLat() {
+        if (geom == null) return null;
+        return geom.getY();
+    }
+    @JsonIgnore
+    public Double getLng() {
+        if (geom == null) return null;
+        return geom.getX();
+    }
 }

@@ -2,6 +2,7 @@ package br.com.smartTrafficFlow.Smart_Traffic_Flow.service;
 
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficDataDTO;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.TrafficAlert;
@@ -79,9 +80,12 @@ public class TrafficService {
         }
     }
 
-    public List<TrafficData> getAll(){
+    public List<TrafficResponse> getAll(){
 
-        return repository.findAll();
+        return repository.findAll()
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
     }
 
     public TrafficData save(TrafficData data){
@@ -147,6 +151,25 @@ public class TrafficService {
                 horarioPico.getValue(),
                 viaMaisMovimentada.getKey(),
                 viaMaisMovimentada.getValue()
+        );
+    }
+
+    private TrafficResponse convertToResponse(TrafficData data) {
+
+        return new TrafficResponse(
+                data.getId(),
+                data.getIdvia(),
+                data.getNome(),
+                data.getTipo(),
+                data.getHora(),
+                data.getClima(),
+                data.getVolume(),
+                data.getCapacidade(),
+                data.getNivel(),
+                data.getStatus(),
+                data.getAlerta(),
+                data.getLat(),
+                data.getLng()
         );
     }
 }
