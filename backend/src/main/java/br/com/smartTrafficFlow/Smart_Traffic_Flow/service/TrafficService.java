@@ -1,17 +1,21 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.service;
 
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficCreateRequest;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficDataDTO;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficMapper;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.TrafficAlert;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.exception.BadRequestException;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.repository.TrafficRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -23,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 public class TrafficService {
     private final TrafficRepository repository;
-    private final GeometryFactory geometryFactory = new GeometryFactory();
+    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     public TrafficService(TrafficRepository repository) {
         this.repository = repository;
@@ -38,15 +42,13 @@ public class TrafficService {
                     .getResourceAsStream("traffic_data.json");
 
             if (inputStream == null) {
-                throw new RuntimeException("Arquivo não encontrado");
+                throw new RuntimeException("Arquivo nao encontrado");
             }
 
-            return mapper.readValue(inputStream, new TypeReference<List<TrafficDataDTO>>() {}
-            );
+            return mapper.readValue(inputStream, new TypeReference<List<TrafficDataDTO>>() {});
         } catch (Exception e) {
             throw new RuntimeException("Erro ao carregar JSON", e);
         }
-
     }
 
     public void loadData() {
@@ -55,8 +57,6 @@ public class TrafficService {
         for (TrafficDataDTO dto : dados){
             if (!repository.existsByIdviaAndHora(dto.getIdvia(), dto.getHora())){
                 TrafficData entity = new TrafficData();
-
-                //mapear os dados
                 entity.setIdvia(dto.getIdvia());
                 entity.setNome(dto.getNome());
                 entity.setTipo(dto.getTipo());
@@ -68,11 +68,8 @@ public class TrafficService {
                 entity.setStatus(dto.getStatus());
                 entity.setAlerta(dto.getAlerta());
 
-                //converter lat/lng -> Point (Geom)
                 if (dto.getLat() != null && dto.getLng() != null){
-                    Point point = geometryFactory.createPoint(
-                            new Coordinate(dto.getLng(), dto.getLat())
-                    );
+                    Point point = geometryFactory.createPoint(new Coordinate(dto.getLng(), dto.getLat()));
                     entity.setGeom(point);
                 }
                 repository.save(entity);
@@ -81,42 +78,45 @@ public class TrafficService {
     }
 
     public List<TrafficResponse> getAll(){
-
         return repository.findAll()
                 .stream()
-                .map(this::convertToResponse)
+                .map(TrafficMapper::toResponse)
                 .toList();
     }
 
-    public TrafficData save(TrafficData data){
-        return repository.save(data);
+    public TrafficResponse save(TrafficCreateRequest request){
+        validateCoordinates(request.lat(), request.lng());
+        TrafficData entity = TrafficMapper.toEntity(request, geometryFactory);
+        TrafficData saved = repository.save(entity);
+        return TrafficMapper.toResponse(saved);
     }
 
-    public List<TrafficData> findByFilters(Climate clima, Double nivel, String alerta){
+    public List<TrafficResponse> findByFilters(Climate clima, Double nivel, String alerta){
+        List<TrafficData> result;
 
         if (alerta != null && !alerta.trim().isEmpty()) {
             try {
                 TrafficAlert alertaEnum = TrafficAlert.valueOf(alerta.toUpperCase());
-                return repository.findByAlerta(alertaEnum);
+                result = repository.findByAlerta(alertaEnum);
+                return result.stream().map(TrafficMapper::toResponse).toList();
             } catch (IllegalArgumentException e) {
-                System.err.println("Aviso: Alerta '" + alerta + "' não encontrado no Enum TrafficAlert.");
-                // Se o alerta for inválido, podemos optar por ignorar o filtro de alerta e seguir para os outros
+                System.err.println("Aviso: Alerta '" + alerta + "' nao encontrado no Enum TrafficAlert.");
             }
         }
 
         if (clima != null && nivel != null) {
-            return repository.findByClimaAndNivelGreaterThan(clima, nivel);
+            result = repository.findByClimaAndNivelGreaterThan(clima, nivel);
+        } else if (clima != null) {
+            result = repository.findByClima(clima);
+        } else if (nivel != null) {
+            result = repository.findByNivelGreaterThan(nivel);
+        } else {
+            result = repository.findAll();
         }
 
-        if (clima != null) {
-            return repository.findByClima(clima);
-        }
-
-        if (nivel != null) {
-            return repository.findByNivelGreaterThan(nivel);
-        }
-
-        return repository.findAll();
+        return result.stream()
+                .map(TrafficMapper::toResponse)
+                .toList();
     }
 
     public TrafficInsightsResponse getInsights() {
@@ -125,7 +125,7 @@ public class TrafficService {
             return new TrafficInsightsResponse(0, "N/D", 0, "N/D", 0.0);
         }
 
-        Map< LocalDateTime, Integer> volumePorHora =
+        Map<LocalDateTime, Integer> volumePorHora =
                 trafficData.stream()
                         .collect(Collectors.groupingBy(
                                 TrafficData::getHora,
@@ -140,7 +140,6 @@ public class TrafficService {
                         .max(Map.Entry.comparingByValue())
                         .orElse(Map.entry(LocalDateTime.MIN, 0));
 
-
         Map.Entry<String, Double> viaMaisMovimentada = mediaPorVia.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .orElse(Map.entry("N/D", 0.0));
@@ -154,22 +153,9 @@ public class TrafficService {
         );
     }
 
-    private TrafficResponse convertToResponse(TrafficData data) {
-
-        return new TrafficResponse(
-                data.getId(),
-                data.getIdvia(),
-                data.getNome(),
-                data.getTipo(),
-                data.getHora(),
-                data.getClima(),
-                data.getVolume(),
-                data.getCapacidade(),
-                data.getNivel(),
-                data.getStatus(),
-                data.getAlerta(),
-                data.getLat(),
-                data.getLng()
-        );
+    private void validateCoordinates(Double lat, Double lng) {
+        if ((lat == null && lng != null) || (lat != null && lng == null)) {
+            throw new BadRequestException("lat e lng devem ser enviados juntos");
+        }
     }
 }

@@ -58,33 +58,49 @@ Comportamento atual:
 
 ### `POST /traffic`
 
-Cria um novo registro manualmente.
+Cria um novo registro manualmente usando DTO próprio de entrada e validação.
 
 Payload de exemplo:
 
 ```json
 {
-  "idvia": 1,
-  "nome": "Av. Central",
-  "tipo": "ARTERIAL",
-  "hora": "2026-03-28T08:00:00",
-  "clima": "LIMPO",
-  "volume": 920,
+  "idvia": 999,
+  "nome": "Via de Teste",
+  "tipo": "arterial",
+  "hora": "2026-03-31T08:00:00",
+  "clima": "limpo",
+  "volume": 250,
   "capacidade": 1000,
-  "nivel": 92.0,
-  "status": "CONGESTIONADO",
-  "alerta": "CRITICO"
+  "nivel": 25.0,
+  "status": "FLUIDO",
+  "alerta": "NORMAL",
+  "lat": -23.5505,
+  "lng": -46.6333
 }
 ```
 
+Validações básicas:
+
+- `idvia` é obrigatório
+- `nome` é obrigatório
+- `tipo` é obrigatório
+- `hora` é obrigatória
+- `volume` deve ser maior que zero
+- `capacidade` deve ser maior que zero
+- `nivel` deve ser maior ou igual a zero
+- `alerta` é obrigatório
+- `lat` e `lng` devem ser enviados juntos quando houver localização
+
 Observações:
 
-- o backend trabalha com enums para `tipo`, `clima`, `status` e `alerta`
-- a entidade persistida também possui `geom`, mas os endpoints de listagem e filtro não expõem esse objeto bruto
+- o endpoint não recebe mais `TrafficData` diretamente
+- a resposta do `POST` usa `TrafficResponse`
+- `tipo` e `clima` seguem o formato serializado atual da API, em minúsculas
+- a geometria interna continua sendo persistida como `geom`, mas o contrato externo expõe apenas `lat` e `lng`
 
 ### `POST /traffic/load`
 
-Tenta carregar dados de um arquivo JSON e persisti-los evitando duplicidade por `idvia + hora`.
+Tenta carregar dados de um arquivo JSON e persistí-los evitando duplicidade por `idvia + hora`.
 
 Fluxo implementado:
 
@@ -166,9 +182,9 @@ classDiagram
 
 ## Resposta Simplificada da API
 
-Os endpoints `GET /traffic` e `GET /traffic/filter` retornam um payload simplificado para facilitar o consumo no frontend.
+Os endpoints `GET /traffic`, `GET /traffic/filter` e `POST /traffic` retornam um payload simplificado para facilitar o consumo no frontend.
 
-A resposta não expõe mais o objeto bruto de `geom`. Quando houver localização, o backend retorna apenas:
+A resposta não expõe o objeto bruto de `geom`. Quando houver localização, o backend retorna apenas:
 
 - `lat`
 - `lng`
@@ -181,7 +197,7 @@ Exemplo:
     "id": 1,
     "idvia": 1,
     "nome": "Av. Central",
-    "tipo": "ARTERIAL",
+    "tipo": "arterial",
     "hora": "2026-03-28T00:00:00",
     "clima": null,
     "volume": 202,
@@ -211,3 +227,4 @@ Com isso:
 - H2
 - Hibernate Spatial
 - H2GIS
+- Springdoc OpenAPI

@@ -1,8 +1,8 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.controller;
 
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficCreateRequest;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficResponse;
-import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.service.TrafficService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,11 +66,11 @@ public class TrafficController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Registro criado com sucesso",
-                    content = @Content(schema = @Schema(implementation = TrafficData.class))),
+                    content = @Content(schema = @Schema(implementation = TrafficResponse.class))),
             @ApiResponse(responseCode = "400", description = "Payload invalido")
     })
-    public ResponseEntity<TrafficData> CreateTraffic(@RequestBody TrafficData data){
-        TrafficData salvo = service.save(data);
+    public ResponseEntity<TrafficResponse> createTraffic(@Valid @RequestBody TrafficCreateRequest request){
+        TrafficResponse salvo = service.save(request);
         return new ResponseEntity<>(salvo, HttpStatus.CREATED);
     }
 
