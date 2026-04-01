@@ -7,8 +7,32 @@
     align-items: flex-start;
 }
 
+.home-header div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home-header img {
+    /* background-image: url('../../assets/logo.png') no-repeat right; */
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+}
+
 .main {
     padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.main-title {
+    background-image: url("../../assets/pin.png") no-repeat;
+    background-size: cover;
+    padding: 10px 10px 10px 40px;
+    color: rgb(149, 149, 150);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .main-option {
@@ -33,6 +57,28 @@ input {
     background-color: rgb(245, 245, 239);
     color: rgb(14, 14, 131);
     margin-bottom: 10px;
+}
+
+.datas-filter {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    background-color: rgb(245, 245, 239);
+    color: #4f4b4b;
+    width: 90%;
+    margin: 5px auto;
+    border-radius: 7px;
+}
+
+.datas-local {
+    display: flex;
+    align-items: center;
+}
+
+.icon-enviar {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
 }
 
 #map {

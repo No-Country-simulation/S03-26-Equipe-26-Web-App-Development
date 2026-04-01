@@ -6,4 +6,4 @@ SmartTrafficFlow
     volume estimado de veiculos, 
     ocorrencia de eventos proximos, 
     horarios, 
-    nivel de trafego em dferentes situações padroes de horarios citicos
+    nivel de trafego em dferentes situações padroes de horarios criticos
