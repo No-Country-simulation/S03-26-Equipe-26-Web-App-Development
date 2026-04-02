@@ -4,6 +4,7 @@ import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.enums.Climate;
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.service.SPTransService;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.service.TrafficService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,11 @@ import java.util.List;
 @Tag(name = "Traffic", description = "Operacoes para consulta, carga e analise dos dados de trafego.")
 public class TrafficController {
 
+
     private final TrafficService service;
+
+    @Autowired
+    private SPTransService spTransService;
 
     public TrafficController(TrafficService service) {
         this.service = service;
@@ -106,6 +112,20 @@ public class TrafficController {
     )
     public TrafficInsightsResponse getInsights() {
         return service.getInsights();
+    }
+
+    @GetMapping("/teste-sptrans")
+    public String testarConexão(){
+        try{
+            boolean logado = spTransService.authenticate();
+            if (logado) {
+                return " Aplicação conectada à SPTrans com sucesso!";
+            } else {
+                return "Falha na autenticação. Verifique o Token.";
+            }
+        } catch (Exception e){
+            return " Erro técnico: " + e.getMessage();
+        }
     }
 
 }
