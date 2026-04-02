@@ -75,7 +75,8 @@ public class TrafficController {
             @ApiResponse(responseCode = "400", description = "Payload invalido")
     })
     public ResponseEntity<TrafficData> CreateTraffic(@RequestBody TrafficData data){
-        TrafficData salvo = service.save(data);
+        TrafficData salvo = service.save(data
+        );
         return new ResponseEntity<>(salvo, HttpStatus.CREATED);
     }
 
