@@ -1,5 +1,6 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.controller;
 
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficAggregationsResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficInsightsResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.dto.TrafficResponse;
 import br.com.smartTrafficFlow.Smart_Traffic_Flow.entity.TrafficData;
@@ -126,6 +127,12 @@ public class TrafficController {
         } catch (Exception e){
             return " Erro técnico: " + e.getMessage();
         }
+    }
+
+    @GetMapping("/aggregations")
+    @Operation(summary = "Dados agragados de tráfego para dashgoards")
+    public TrafficAggregationsResponse getAggregations() {
+        return service.getAggregations();
     }
 
 }
