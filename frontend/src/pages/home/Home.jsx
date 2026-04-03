@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+// import L from 'leaflet'
+// import 'leaflet/dist/leaflet.css'
 import './Home.css'
 import logo from '../../assets/logo.png'
 import iconEnviar from '../../assets/enviar.png'
