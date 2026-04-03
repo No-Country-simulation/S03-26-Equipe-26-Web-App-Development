@@ -63,7 +63,7 @@ function Home() {
         }
 
         const fetchFilter = async () => {
-            fetch("http://localhost:8080/traffic/filter")
+            fetch("http://localhost:8080/traffic")
                 .then((response) => {
                     if (!response.ok) {
                         throw new Error(`Erro HTTP ${response.status}`);
@@ -137,7 +137,7 @@ function Home() {
                 </div> */}
             <section className="datas">
                 {optionRoute ?
-                    filter.map((item, index) => (
+                    filter && filter.map((item, index) => (
                         <button key={index} className='datas-filter'>
                             <div className='datas-local'>
                                 <img src={iconEnviar} alt="" className='icon-enviar' />
