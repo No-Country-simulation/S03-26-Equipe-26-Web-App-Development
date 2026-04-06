@@ -140,6 +140,35 @@ Exemplo:
 }
 ```
 
+### `GET /traffic/aggregations`
+
+Retorna agregações simples para o MVP com base nos registros persistidos.
+
+Resposta atual:
+
+- `volumePorHorario`: média de volume por horário
+- `volumePorTipoVia`: agrupamento por tipo de via com quantidade de registros e média de volume
+
+Exemplo:
+
+```json
+{
+  "volumePorHorario": [
+    {
+      "hora": "08:00",
+      "mediaVolume": 454.33
+    }
+  ],
+  "volumePorTipoVia": [
+    {
+      "tipoVia": "ARTERIAL",
+      "quantidade": 24,
+      "mediaVolume": 320.5
+    }
+  ]
+}
+```
+
 ## Fluxo de Consulta
 
 ```mermaid

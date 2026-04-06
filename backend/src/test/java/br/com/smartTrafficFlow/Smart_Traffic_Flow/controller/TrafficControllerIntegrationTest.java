@@ -22,7 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource(properties = {
         "openweather.api.key=test-key",
-        "openweather.api.url=https://api.openweathermap.org/data/2.5/weather"
+        "openweather.api.url=https://api.openweathermap.org/data/2.5/weather",
+        "sptrans.token=test-token",
+        "sptrans.api.url=http://api.olhovivo.sptrans.com.br/v2.1"
 })
 class TrafficControllerIntegrationTest {
 
