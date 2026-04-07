@@ -90,7 +90,7 @@ function Home() {
 
     if (loading) return <p>Carregando insights...</p>;
     if (error) return <p>{error}</p>;
-    if (!insights) return <p>Nenhum insight disponivel.</p>;
+    // if (!insights) return <p>Nenhum insight disponivel.</p>;
 
 
     return (
