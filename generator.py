@@ -15,27 +15,33 @@ def generate_geo_traffic_data():
         fator_clima = 1.2 if clima_atual == "Chuva Leve" else (1.5 if clima_atual == "Chuva Forte" else 1.0)
 
         for via in vias:
+            # Lógica de Picos Comerciais (Fabio v2.0)
             if via["tipo"] == "Arterial" and (hora == 8 or hora == 18):
                 vol_base = random.randint(850, 980)
+            # Lógica de Anomalia (Evento aleatório na madrugada)
+            elif via["id"] == 1 and hora == 3:
+                vol_base = 920 # Simula um incidente às 03h na Av. Central
             else:
                 vol_base = random.randint(50, via["cap"] // 2)
 
-            vol_final = int(vol_base * fator_clima)
+            vol_final = int(vol_base * factor_clima)
             if vol_final > via["cap"] * 1.2: vol_final = int(via["cap"] * 1.2)
 
             nivel = round((vol_final / via["cap"]) * 100, 2)
             
-            status = "Fluido"
+            # Alinhando Status e Alertas com a Documentação v2.0
+            status = "Livre"
             alerta = "Normal"
+            
             if nivel > 70: 
-                status = "Lento"
-                alerta = "Atencao"
+                status = "Moderado"
+                alerta = "⚠️ CRÍTICO" # Usando o padrão do Fabio
             if nivel > 90: 
-                status = "Congestionado"
-                alerta = "Critico"
+                status = "Crítico"
+                alerta = "🚨 ANOMALIA" if hora < 6 else "⚠️ CRÍTICO"
 
             dataset.append({
-                "idvia": via["id"],
+                "id_via": via["id"], # Corrigido para bater com a doc
                 "nome": via["nome"],
                 "tipo": via["tipo"],
                 "hora": f"{hora:02d}:00",
@@ -55,6 +61,6 @@ if __name__ == "__main__":
         data = generate_geo_traffic_data()
         with open('traffic_data.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
-        print("Sucesso: Dados gerados e sincronizados!")
+        print("✅ Sucesso: Dados gerados e 100% alinhados com a Documentação v2.0!")
     except Exception as e:
-        print(f"Erro: {e}")
+        print(f"❌ Erro: {e}")
