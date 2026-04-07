@@ -12,9 +12,9 @@ Este documento descreve o estado atual do frontend da aplicação.
 
 Arquivos principais:
 
-- [frontend/src/App.jsx](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/src/App.jsx)
-- [frontend/src/pages/home/Home.jsx](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/src/pages/home/Home.jsx)
-- [frontend/package.json](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/frontend/package.json)
+- [frontend/src/App.jsx](../frontend/src/App.jsx)
+- [frontend/src/pages/home/Home.jsx](../frontend/src/pages/home/Home.jsx)
+- [frontend/package.json](../frontend/package.json)
 
 ## Estado Atual da Interface
 
@@ -38,7 +38,8 @@ flowchart LR
 
 ## Observações Importantes
 
-- o frontend atual ainda não mostra chamadas explícitas para a API do backend
+- o frontend atual ainda não mostra chamadas explícitas para a API do backend na `dev`
+- a branch `frontend` já teve uma tentativa inicial de integração com `/traffic/insights` e `/traffic/filter`, mas isso ainda não foi consolidado na `dev`
 - a dependência `leaflet` e seu CSS são importados em `Home.jsx`, mas não aparecem declarados em `frontend/package.json`
 - o `frontend/README.md` ainda está no template padrão do Vite e pode ser atualizado depois, se o time quiser documentação interna por pasta
 

@@ -14,7 +14,7 @@ Arquivos relacionados:
 - `generator.py`
 - `traffic_data.json`
 - `backend/src/main/resources/import.sql`
-- [TrafficDataDTO.java](C:/NoCountry/SimulacaodeTrabalho/SmartTrafficFlow/S03-26-Equipe-26-Web-App-Development/backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/dto/TrafficDataDTO.java)
+- [TrafficDataDTO.java](../backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/dto/TrafficDataDTO.java)
 
 ## Lógica de Simulação
 
