@@ -14,6 +14,7 @@ function Login() {
                         <img src={iconGoogle} alt="" />
                         <p>Conta Google</p>
                     </button>
+                    {/* <div class="g-signin2" data-onsuccess="onSignIn"></div> */}
                 </section>
             {/* </div> */}
         </>
