@@ -1,15 +1,16 @@
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useState } from 'react'
 import './App.css'
 import Home from './pages/home/Home'
-import TrafficInsights from './utils/Traffic'
+import Login from './pages/login/Login'
 
 function App() {
 
+  const [ statusLogin, setStatusLogin] = useState(false)
+
   return (
-    <>
-      <Home />
+    <>    
+      {statusLogin ? <Login /> : <Home />}
+      
     </>
   )
 }

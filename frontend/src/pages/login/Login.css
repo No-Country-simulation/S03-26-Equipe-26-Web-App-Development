@@ -1,0 +1,46 @@
+.title {
+    margin: auto 0;
+}
+
+.login {
+    border: 1px solid #9e9999;
+    border-radius: 10px;
+    width: 50%;
+    height: 200px;
+    margin: auto;
+    background-color: rgb(14, 14, 131);
+    color: aliceblue;
+}
+
+.login-logo {
+    width: 30%;
+    margin-top: -100px;
+}
+
+.login h2 {
+    color: #ebe6e6;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.login button {
+    width: 80%;
+    flex-direction: row;
+    background-color: aliceblue;
+    border-radius: 50px;
+    border: none;
+    justify-content: start;
+}
+
+.login p {
+    font-weight: bolder;
+    font-size: 20px;
+    color: #323232;
+    margin-left: 50px;
+}
+
+.center {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}

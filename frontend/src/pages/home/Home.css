@@ -20,16 +20,20 @@
     margin: 5px;
 }
 
+.home-header p {
+    color: azure;
+}
+
 .main {
     padding: 10px;
     font-family: 'Courier New', Courier, monospace;
+    color: rgb(229, 229, 236);
 }
 
 .main-title {
     background-image: url("../../assets/pin.png") no-repeat;
     background-size: cover;
     padding: 10px 10px 10px 40px;
-    color: rgb(149, 149, 150);
     display: flex;
     align-items: center;
     justify-content: center;
