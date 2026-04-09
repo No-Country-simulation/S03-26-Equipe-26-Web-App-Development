@@ -115,4 +115,9 @@ public class TrafficController {
         return service.getInsights();
     }
 
+    @GetMapping("/news")
+    public ResponseEntity<String> getTrafficNews(@RequestParam String query) {
+        return ResponseEntity.ok(service.searchTrafficNews(query));
+    }
+
 }
