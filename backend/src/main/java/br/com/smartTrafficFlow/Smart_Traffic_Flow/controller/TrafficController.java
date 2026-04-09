@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -55,7 +56,10 @@ public class TrafficController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = TrafficResponse.class)))
     )
     public List<TrafficResponse> getAll(){
-        return service.getAll();
+        List<TrafficResponse> lista = service.getAll();
+        return lista;
+
+
     }
 
     @PostMapping
@@ -91,9 +95,12 @@ public class TrafficController {
             @Parameter(description = "Alerta de trafego", example = "ANOMALIA")
             @RequestParam(required = false) String alerta) {
 
-        return service.findByFilters(clima, nivel, alerta);
-    }
+        // CORREÇÃO AQUI: O tipo da variável deve ser TrafficResponse, pois o service já converteu!
+        List<TrafficResponse> listaFiltrada = service.findByFilters(clima, nivel, alerta);
 
+        // Basta retornar a lista, não precisa mais do .stream().map(...) aqui
+        return listaFiltrada;
+    }
     @GetMapping("/insights")
     @Operation(
             summary = "Retorna insights consolidados do trafego",
