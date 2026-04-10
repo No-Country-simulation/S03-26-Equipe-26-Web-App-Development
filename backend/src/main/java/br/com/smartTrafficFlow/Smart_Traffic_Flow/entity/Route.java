@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.LineString;
 @Entity
 @Getter
 @Setter
+@Table(name = "route")
 public class Route {
 
     @Id

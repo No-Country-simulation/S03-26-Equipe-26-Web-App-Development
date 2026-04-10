@@ -64,6 +64,7 @@ public class TrafficData {
 
     @Column(columnDefinition = "geometry(Point, 4326)")
     @Schema(description = "Geometria espacial interna usada pelo backend", hidden = true)
+    @JsonIgnore
     private Point geom;
 
     @JsonIgnore
