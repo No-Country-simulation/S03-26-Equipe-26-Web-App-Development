@@ -1,18 +1,31 @@
-from loaders.gtfs_loader import carregar_arquivos
-from services.gtfs_service import BASE_PATHS
+import requests
+from core.config import TOMTOM_KEY
 
-def gerar_analise(cidade):
-    if cidade not in BASE_PATHS:
-        return {"erro": "Cidade não encontrada no mapeamento"}
 
-    # Busca o caminho real configurado no gtfs_service
-    caminho = BASE_PATHS[cidade]
-    dados = carregar_arquivos(caminho)
+class TrafficService:
 
-    # ... sua lógica de contagem
-    return {
-        "cidade": cidade,
-        "total_paradas": len(dados["stops"]),
-        "total_viagens": len(dados["trips"]),
-        "total_registros_stop_times": len(dados["stop_times"])
-    }
+    BASE_URL = "https://api.tomtom.com/traffic/services/4"
+
+    @staticmethod
+    def get_flow(lat: float, lon: float):
+
+        url = f"{TrafficService.BASE_URL}/flowSegmentData/absolute/10/json"
+
+        params = {
+            "point": f"{lat},{lon}",
+            "key": TOMTOM_KEY
+        }
+
+        response = requests.get(url, params=params)
+
+        if response.status_code != 200:
+            return {"erro": "Falha TomTom"}
+
+        flow = response.json().get("flowSegmentData", {})
+
+        return {
+            "velocidade_atual": flow.get("currentSpeed"),
+            "velocidade_livre": flow.get("freeFlowSpeed"),
+            "tempo_viagem": flow.get("travelTime"),
+            "confianca": flow.get("confidence")
+        }

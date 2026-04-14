@@ -1,16 +1,16 @@
-from fastapi import APIRouter, HTTPException
-from microservice.services.analytics_service import (
-    gerar_analise_cidade,
-    get_all_cities_analytics,
-    get_traffic_heatmap
-)
+from fastapi import APIRouter, HTTPException, Query
+from typing import Optional
+# IMPORTANTE: Importamos APENAS a classe. 
+# Remova as funções get_all_cities_analytics e get_traffic_heatmap do import.
+from services.analytics_service import AnalyticsService
 
-router = APIRouter()
+router = APIRouter(prefix="/analytics")
 
 @router.get("/analise/{cidade}")
 def analise_cidade(cidade: str):
     """Retorna análise detalhada de uma cidade."""
-    resultado = gerar_analise_cidade(cidade)
+    # Chamada via classe: Correto
+    resultado = AnalyticsService.gerar_analise_cidade(cidade)
     
     if "erro" in resultado:
         raise HTTPException(status_code=404, detail=resultado["erro"])
@@ -20,7 +20,8 @@ def analise_cidade(cidade: str):
 @router.get("/analise/todas")
 def analise_todas_cidades():
     """Retorna análise de todas as cidades."""
-    return get_all_cities_analytics()
+    # Chamada via classe: Correto
+    return AnalyticsService.get_all_cities_analytics()
 
 @router.get("/heatmap/{cidade}")
 def heatmap_trafego(
@@ -29,4 +30,5 @@ def heatmap_trafego(
     hora_fim: Optional[int] = Query(None, ge=0, le=23)
 ):
     """Retorna dados para heatmap de tráfego."""
-    return get_traffic_heatmap(cidade, hora_inicio, hora_fim)
+    # Chamada via classe: Correto
+    return AnalyticsService.get_traffic_heatmap(cidade, hora_inicio, hora_fim)

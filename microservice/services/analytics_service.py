@@ -1,80 +1,40 @@
-from microservice.services.gtfs_service import (
-    get_stops, get_routes, get_trips, get_stop_times, BASE_PATHS
-)
+import pandas as pd
+import numpy as np
+from loaders.gtfs_loader import carregar_arquivos
+from core.config import BASE_PATHS
 
-def gerar_analise_cidade(cidade: str):
-    """Gera análise completa de uma cidade."""
-    if cidade not in BASE_PATHS:
-        return {"erro": f"Cidade '{cidade}' não encontrada no mapeamento"}
-
-    caminho = BASE_PATHS[cidade]
-    
-    # Coletar dados
-    stops = get_stops(cidade) or []
-    routes = get_routes(cidade) or []
-    trips = get_trips(cidade) or []
-    stop_times = get_stop_times(cidade) or []
-
-    # Análises
-    total_paradas = len(stops)
-    total_rotas = len(routes)
-    total_viagens = len(trips)
-    total_horarios = len(stop_times)
-
-    # Calcular densidade de paradas (se tiver coordenadas)
-    paradas_com_coords = sum(1 for s in stops if s.get("stop_lat") and s.get("stop_lon"))
-    
-    # Tipos de rota
-    tipos_rota = {}
-    for route in routes:
-        route_type = route.get("route_type", "Desconhecido")
-        tipos_rota[route_type] = tipos_rota.get(route_type, 0) + 1
-
-    return {
-        "cidade": cidade,
-        "caminho_dados": caminho,
-        "total_paradas": total_paradas,
-        "paradas_com_coordenadas": paradas_com_coords,
-        "total_rotas": total_rotas,
-        "total_viagens": total_viagens,
-        "total_horarios": total_horarios,
-        "tipos_rota": tipos_rota,
-        "status": "OK"
+class AnalyticsService:
+    # Cache global que carrega ao iniciar o Uvicorn
+    _DADOS_CARREGADOS = {
+        "sao_paulo": carregar_arquivos(BASE_PATHS["sao_paulo"])
     }
 
-def get_all_cities_analytics():
-    """Retorna análise de todas as cidades."""
-    resultados = {}
-    for cidade in BASE_PATHS.keys():
-        resultados[cidade] = gerar_analise_cidade(cidade)
-    return resultados
+    @staticmethod
+    def gerar_analise_cidade(cidade: str):
+        dados = AnalyticsService._DADOS_CARREGADOS.get(cidade)
+        if not dados or not isinstance(dados.get("stops"), pd.DataFrame):
+            return {"erro": f"Dados de {cidade} não encontrados."}
 
-def get_traffic_heatmap(cidade: str, hora_inicio: int = None, hora_fim: int = None):
-    """Gera dados simulados para heatmap de tráfego."""
-    # Simulação - você pode integrar com seus dados reais depois
-    import random
-    
-    stops = get_stops(cidade) or []
-    
-    heatmap_data = []
-    for stop in stops[:50]:  # Limitar para performance
-        if stop.get("stop_lat") and stop.get("stop_lon"):
-            # Simular congestionamento baseado na hora
-            if hora_inicio and hora_fim:
-                congestion = random.uniform(0.3, 0.9)
-            else:
-                congestion = random.uniform(0.1, 0.95)
-            
-            heatmap_data.append({
-                "lat": stop["stop_lat"],
-                "lng": stop["stop_lon"],
-                "stop_name": stop.get("stop_name", "Parada"),
-                "congestionamento": round(congestion, 2),
-                "nivel": "ALTO" if congestion > 0.7 else "MEDIO" if congestion > 0.4 else "BAIXO"
-            })
-    
-    return {
-        "cidade": cidade,
-        "total_pontos": len(heatmap_data),
-        "dados": heatmap_data
-    }
+        return {
+            "cidade": cidade,
+            "total_paradas": len(dados["stops"]),
+            "total_rotas": len(dados["routes"]),
+            "total_viagens": len(dados["trips"]),
+            "status": "online"
+        }
+
+    @staticmethod
+    def get_all_cities_analytics():
+        return {
+            "cidades_disponiveis": list(AnalyticsService._DADOS_CARREGADOS.keys()),
+            "total_cidades": len(AnalyticsService._DADOS_CARREGADOS)
+        }
+
+    @staticmethod
+    def get_traffic_heatmap(cidade: str, hora_inicio: int = None, hora_fim: int = None):
+        dados = AnalyticsService._DADOS_CARREGADOS.get(cidade)
+        if not dados or "stops" not in dados:
+            return []
+        
+        stops = dados["stops"]
+        return stops[['stop_lat', 'stop_lon']].head(1000).to_dict(orient="records")

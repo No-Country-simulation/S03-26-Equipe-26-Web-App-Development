@@ -1,14 +1,19 @@
 package br.com.smartTrafficFlow.Smart_Traffic_Flow.config;
 
 
+import br.com.smartTrafficFlow.Smart_Traffic_Flow.security.JwtAuthenticationFilter;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,85 +22,103 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
-
-import static org.springframework.security.authorization.SingleResultAuthorizationManager.permitAll;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtFilter jwtFilter;
+    // 🔐 filtros e auth service
+    private final JwtAuthenticationFilter jwtFilter;
+    private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtFilter jwtFilter){
-        this.jwtFilter = jwtFilter;
+    @PostConstruct
+    public void setupSecurityContext() {
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
+    // ===============================
+    // SECURITY FILTER CHAIN
+    // ===============================
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                // 1. Configuração de CORS para permitir que o React (porta 5173) acesse o Java
-                .cors(Customizer.withDefaults())
-
-                // 2. Desabilitar CSRF para APIs REST
+        return http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-
-                // 3. Importante: H2 Console e Frames
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-
-                // 4. Gerenciamento de Sessão:
-                // Usamos STATELESS para o JWT, mas o OAuth2 precisa criar uma sessão temporária
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers(
-                                "/login/**",
-                                "/oauth2/**",
-                                "/error",
-                                "/favicon.ico"
-                        ).permitAll()
+                        // 🔓 Rotas públicas (Auth e Swagger)
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/traffic/traffic-volume","/traffic/traffic-volume-area", "/traffic/sptrans/posicao").permitAll()
 
-                        // Garante que os recursos do React não sejam bloqueados
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
+                        // 🔒 Garante que a rota de tráfego está sob autenticação
+                        // (O .anyRequest().authenticated() já cobre isso, mas vamos ser explícitos se o erro persistir)
+                        .requestMatchers("/traffic/**").authenticated()
+
+                        .anyRequest().authenticated()
                 )
-
-                // 5. Configuração do OAuth2 para o Google
-                .oauth2Login(oauth2 -> oauth2
-                        // Após o sucesso no Google, ele volta para o seu Dashboard no React
-                        .defaultSuccessUrl("http://localhost:5173/dashboard", true)
-                )
-
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
-    // Configuração de CORS: Essencial para evitar erros de bloqueio no navegador
+    // ===============================
+    // AUTH PROVIDER (ESSENCIAL)
+    // ===============================
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Porta do seu Vite/React
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+    public DaoAuthenticationProvider authenticationProvider() {
+
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+
+        return provider;
     }
 
+    // ===============================
+    // AUTH MANAGER
+    // ===============================
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration
+    ) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    // ===============================
+    // PASSWORD ENCODER
+    // ===============================
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // ===============================
+    // CORS (FRONT VITE)
+    // ===============================
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        // 🚨 ADICIONE TODAS AS PORTAS QUE VOCÊ USA NO FRONT (3000, 5173, etc)
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "http://127.0.0.1:5173"
+        ));
+
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
 
