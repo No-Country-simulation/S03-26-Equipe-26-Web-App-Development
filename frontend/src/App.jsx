@@ -9,8 +9,7 @@ function App() {
 
   return (
     <>    
-      {statusLogin ? <Login /> : <Home />}
-      
+      {statusLogin ? <Login /> : <Home />}      
     </>
   )
 }

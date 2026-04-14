@@ -5,6 +5,10 @@ import './Home.css'
 import logo from '../../assets/logo.png'
 import iconEnviar from '../../assets/enviar.png'
 import iconPin from '../../assets/pin.png'
+import dados from '../../../../traffic_data.json'
+import BarChart from '../../utils/graficoBarrasMelhorado'
+import LineChart from '../../utils/graficoLinhas'
+import PieChart from '../../utils/graficoPizza'
 
 function Home() {
 
@@ -36,60 +40,67 @@ function Home() {
     //     };
     // }, []);
     const [insights, setInsights] = useState(null);
-    const [filter, setFilter] = useState(null);
+    const [filter, setFilter] = useState(dados);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [infoClick, setInfoClick] = useState(false);
+    const [numeroInfo, setNumeroInfo] = useState(null);
 
-    useEffect(() => {
-        const fetchInsight = async () => {
-            fetch("http://localhost:8080/traffic/insights")
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Erro HTTP ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    setInsights(data);
-                    setError("");
-                })
-                .catch((err) => {
-                    console.error("Erro ao carregar insights:", err);
-                    setError("Nao foi possivel carregar os insights.");
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        }
+    // const data = [30, 50, 20];
+    const labels = ["volume", "capacidade", "congestionamento"];
+    const levels = [1]; // Índices das fatias que serão destacadas
 
-        const fetchFilter = async () => {
-            fetch("http://localhost:8080/traffic")
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`Erro HTTP ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    setFilter(data);
-                    setError("");
-                })
-                .catch((err) => {
-                    console.error("Erro ao carregar filter:", err);
-                    setError("Nao foi possivel carregar os filter.");
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        }
+    // useEffect(() => {
+    //     const fetchInsight = async () => {
+    //         fetch("http://localhost:8080/traffic/insights")
+    //             .then((response) => {
+    //                 if (!response.ok) {
+    //                     throw new Error(`Erro HTTP ${response.status}`);
+    //                 }
+    //                 return response.json();
+    //             })
+    //             .then((data) => {
+    //                 setInsights(data);
+    //                 setError("");
+    //             })
+    //             .catch((err) => {
+    //                 console.error("Erro ao carregar insights:", err);
+    //                 setError("Nao foi possivel carregar os insights.");
+    //             })
+    //             .finally(() => {
+    //                 setLoading(false);
+    //             });
+    //     }
+
+    //     const fetchFilter = async () => {
+    //         fetch("http://localhost:8080/traffic")
+    //             .then((response) => {
+    //                 if (!response.ok) {
+    //                     throw new Error(`Erro HTTP ${response.status}`);
+    //                 }
+    //                 return response.json();
+    //             })
+    //             .then((data) => {
+    //                 setFilter(data);
+    //                 setError("");
+    //                 console.log(data)
+    //             })
+    //             .catch((err) => {
+    //                 console.error("Erro ao carregar filter:", err);
+    //                 setError("Nao foi possivel carregar os filter.");
+    //             })
+    //             .finally(() => {
+    //                 setLoading(false);
+    //             });
+    //     }
 
 
-        fetchInsight();
-        fetchFilter();
-    }, []);
+    //     fetchInsight();
+    //     fetchFilter();
+    // }, []);
 
-    if (loading) return <p>Carregando insights...</p>;
-    if (error) return <p>{error}</p>;
+    // if (loading) return <p>Carregando insights...</p>;
+    // if (error) return <p>{error}</p>;
     // if (!insights) return <p>Nenhum insight disponivel.</p>;
 
 
@@ -103,7 +114,7 @@ function Home() {
                 <p>SISTEMA DE FLUXO DINÂMICO</p>
             </section>
 
-            <section className="main">
+            <section className={"main"}>
                 <p className='main-title'>
                     <img src={iconPin} alt="" />
                     <label htmlFor="">SELECIONAR LOCAL/TRAJE</label>TO
@@ -116,7 +127,7 @@ function Home() {
 
                 <div className='main-local'>
                     {optionRoute ?
-                        <input type="text" placeholder='Localização' />
+                        "" // <input type="text" placeholder='Localização' />
                         :
                         <p>
                             <input type="text" placeholder='Ponto de Partida' />
@@ -138,16 +149,42 @@ function Home() {
             <section className="datas">
                 {optionRoute ?
                     filter && filter.map((item, index) => (
-                        <button key={index} className='datas-filter'>
-                            <div className='datas-local'>
-                                <img src={iconEnviar} alt="" className='icon-enviar' />
-                                <p>{item.nome}</p>
-                            </div>
-                            <p>{item.tipo}</p>
-                        </button>
+                        <div>
+                            <button key={index} className='datas-filter'
+                                onClick={() => {
+                                    setNumeroInfo([
+                                        item.idvia,
+                                        item.volume,
+                                        item.capacidade,
+                                        item.nivel_congestionamento])
+                                    setInfoClick(!infoClick)
+                                    console.log(infoClick, numeroInfo, filter[numeroInfo[0]].clima)
+                                }}>
+                                <div className='datas-local'>
+                                    <img src={iconEnviar} alt="" className='icon-enviar' />
+                                    <p>{item.nome}</p>
+                                </div>
+                                <p>{item.tipo}</p>
+                            </button>
+                        </div>
                     ))
                     :
                     ""}
+                {
+                    infoClick && (
+                        <section className='modal' key={'info'}>
+                            <span className='btn-close' onClick={() => setInfoClick(false)}>X</span>
+                            <label htmlFor="">CONDIÇÕES DE AMBIENTE</label><br />
+                            <button>Clima: {filter[numeroInfo[0]].clima}</button>
+                            <button>Status: {filter[numeroInfo[0]].status}</button>
+                            <button>Alerta: {filter[numeroInfo[0]].alerta}</button><br /><br />
+                            {/* <BarChart data={[[numeroInfo[1]], [numeroInfo[2]], [numeroInfo[3]]]} /> */}
+                            <BarChart
+                                data={[[numeroInfo[1]], [numeroInfo[2]], [numeroInfo[3]]]}
+                                labels={labels} levels={levels} />
+                        </section>
+                    )
+                }
             </section>
 
 
