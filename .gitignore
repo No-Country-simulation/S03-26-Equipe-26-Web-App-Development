@@ -1,6 +1,47 @@
-.idea/
-# Python cache
+# =====================
+# PYTHON (MICROSERVICE)
+# =====================
 __pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# logs
+*.log
+
+# environment
+.env
+.venv/
+venv/
+
+# =====================
+# JAVA (BACKEND)
+# =====================
+target/
+*.class
+
+# =====================
+# NODE / FRONTEND
+# =====================
+node_modules/
+dist/
+build/
+
+# =====================
+# IDEs
+# =====================
+.idea/
+*.iml
+.vscode/
+
+# =====================
+# SYSTEM
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# DOCKER (opcional)
+# =====================
+*.pid
