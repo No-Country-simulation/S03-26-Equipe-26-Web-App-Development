@@ -1,14 +1,13 @@
-# Java 21 base image
-FROM eclipse-temurin:21-jdk
+FROM python:3.11
 
-# Diretório da aplicação
 WORKDIR /app
 
-# Copia o jar gerado pelo Maven
-COPY target/*.jar app.jar
+COPY requirements.txt .
 
-# Porta do microservice
-EXPOSE 8090
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Executa a aplicação
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

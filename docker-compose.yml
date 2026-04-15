@@ -1,0 +1,66 @@
+services:
+  # O nome do serviço DEVE ser 'db' para bater com sua URL do Spring
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: smart_postgres
+    environment:
+      POSTGRES_DB: smart_traffic_flow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d smart_traffic_flow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smart-network
+
+  backend:
+    build: ./backend
+    container_name: smart_backend
+    # O healthcheck garante que o Java só tente conectar quando o banco estiver 100% pronto
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/smart_traffic_flow
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    networks:
+      - smart-network
+
+  microservice:
+    build: ./microservice
+    container_name: smart_microservice
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    networks:
+      - smart-network
+
+  frontend:
+    build:
+      context: ./SmartTrafficFlow
+      dockerfile: Dockerfile
+    container_name: smart_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - smart-network
+
+networks:
+  smart-network:
+    driver: bridge
