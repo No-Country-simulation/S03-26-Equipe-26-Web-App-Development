@@ -15,7 +15,7 @@ Este documento descreve o estado atual da camada frontend na branch `dev`.
 - `frontend/src/App.jsx`
 - `frontend/src/pages/home/Home.jsx`
 - `frontend/src/pages/login/Login.jsx`
-- `frontend/src/utils/*` (graficos)
+- `frontend/src/utils/*` (gráficos)
 
 ## Estado atual da interface
 
@@ -26,41 +26,41 @@ Este documento descreve o estado atual da camada frontend na branch `dev`.
 - `statusLogin = false` => renderiza Home
 - `statusLogin = true` => renderiza Login
 
-No estado atual, a Home e a tela inicial exibida por padrao.
+No estado atual, a Home é a tela inicial exibida por padrão.
 
 ### Home
 
 A tela Home entrega:
 
 - identidade visual do projeto
-- selecao `LOCAL` x `TRAJETO`
+- seleção `LOCAL` x `TRAJETO`
 - listagem e detalhe de dados com modal
-- visualizacoes graficas (barra, linha, pizza) via utilitarios locais
+- visualizações gráficas (barra, linha, pizza) via utilitários locais
 
 Fonte de dados atual da Home:
 
 - import direto de `traffic_data.json` da raiz
 
-Observacao importante:
+Observação importante:
 
-- chamadas `fetch` para backend existem no codigo, mas estao desativadas (comentadas).
+- chamadas `fetch` para backend existem no código, mas estão desativadas (comentadas).
 
 ### Login
 
 A tela Login possui:
 
 - layout de login
-- botao de conta Google
+- botão de conta Google
 
-Observacao:
+Observação:
 
-- a integracao efetiva de login com backend ainda nao esta conectada ao fluxo de navegacao da UI.
+- a integração efetiva de login com backend ainda não está conectada ao fluxo de navegação da UI.
 
-## Integracao com API (status)
+## Integração com API (status)
 
-- Integracao parcial / em evolucao
-- Backend possui endpoints prontos, porem o frontend ainda utiliza majoritariamente dados locais
-- Integracoes prioritarias:
+- Integração parcial / em evolução
+- Backend possui endpoints prontos, porém o frontend ainda utiliza majoritariamente dados locais
+- Integrações prioritárias:
 - `/auth/login`
 - `/traffic/insights`
 - `/traffic/filter`
@@ -68,18 +68,18 @@ Observacao:
 
 ## Como executar
 
-No diretorio `frontend`:
+No diretório `frontend`:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Ambiente local padrao:
+Ambiente local padrão:
 
 - `http://localhost:5173`
 
-## Dependencias confirmadas no `package.json`
+## Dependências confirmadas no `package.json`
 
 - `react`
 - `react-dom`
@@ -88,7 +88,7 @@ Ambiente local padrao:
 
 ## Riscos e ajustes recomendados para Demo Day
 
-1. Conectar Home com `GET /traffic` e `GET /traffic/insights` (retirar dependencia do JSON local para o fluxo principal).
+1. Conectar Home com `GET /traffic` e `GET /traffic/insights` (retirar dependência do JSON local para o fluxo principal).
 2. Conectar Login com `POST /auth/login` e armazenamento de token para chamadas autenticadas.
-3. Definir variavel de ambiente de frontend para base URL da API.
-4. Atualizar `frontend/README.md` (atualmente template padrao do Vite).
+3. Definir variável de ambiente de frontend para base URL da API.
+4. Atualizar `frontend/README.md` (atualmente template padrão do Vite).

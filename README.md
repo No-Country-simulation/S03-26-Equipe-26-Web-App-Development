@@ -1,14 +1,14 @@
 # Smart Traffic Flow
 
-Aplicacao full stack para observabilidade e analise de mobilidade urbana, com backend em Spring Boot, frontend em React/Vite e integracoes externas (SPTrans, TomTom, OpenWeather e Google OAuth).
+Aplicação full stack para observabilidade e análise de mobilidade urbana, com backend em Spring Boot, frontend em React/Vite e integrações externas (SPTrans, TomTom, OpenWeather e Google OAuth).
 
 ## Estado Atual (15/04/2026)
 
 - Branch `dev` local sincronizada com `origin/dev`
-- Backend com autenticacao JWT ativa
-- Persistencia principal em PostgreSQL
-- Endpoints de trafego, autenticacao, transporte, GTFS, clima e analytics
-- Frontend funcional com Home/Login e componentes de visualizacao, com integracao parcial com a API
+- Backend com autenticação JWT ativa
+- Persistência principal em PostgreSQL
+- Endpoints de tráfego, autenticação, transporte, GTFS, clima e analytics
+- Frontend funcional com Home/Login e componentes de visualização, com integração parcial com a API
 
 ## Stack
 
@@ -32,19 +32,19 @@ Aplicacao full stack para observabilidade e analise de mobilidade urbana, com ba
 
 ### Microservice (complementar)
 
-- Python (pasta `microservice/`) para servicos auxiliares de roteamento, GTFS e analytics
+- Python (pasta `microservice/`) para serviços auxiliares de roteamento, GTFS e analytics
 
-## Documentacao
+## Documentação
 
 - [API](docs/api.md)
 - [Dados](docs/dados.md)
 - [Frontend](docs/frontend.md)
 
-## Arquitetura (alto nivel)
+## Arquitetura (alto nível)
 
 ```mermaid
 flowchart LR
-    U[Usuario] --> F[Frontend React/Vite]
+    U[Usuário] --> F[Frontend React/Vite]
     F --> B[Backend Spring Boot]
     B --> P[(PostgreSQL)]
     B --> S[SPTrans API]
@@ -72,7 +72,7 @@ flowchart LR
 
 ### 1) Backend
 
-No diretorio `backend`:
+No diretório `backend`:
 
 ```powershell
 .\mvnw.cmd spring-boot:run
@@ -92,7 +92,7 @@ Backend local:
 
 ### 2) Frontend
 
-No diretorio `frontend`:
+No diretório `frontend`:
 
 ```bash
 npm install
@@ -103,7 +103,7 @@ Frontend local:
 
 - `http://localhost:5173`
 
-## Variaveis de Ambiente (backend)
+## Variáveis de Ambiente (backend)
 
 Principais chaves usadas pelo backend:
 
@@ -118,9 +118,9 @@ Principais chaves usadas pelo backend:
 Diretrizes:
 
 - manter `.env.example` sem segredos reais
-- nao versionar credenciais/tokens no repositório
+- não versionar credenciais/tokens no repositório
 
-## Endpoints Principais (visao geral)
+## Endpoints Principais (visão geral)
 
 - `POST /auth/register`
 - `POST /auth/login`
@@ -146,6 +146,6 @@ Suites de teste presentes em `backend/src/test`:
 - `TrafficAggregationTest`
 - `SmartTrafficFlowApplicationTests`
 
-## Licenca
+## Licença
 
-Este projeto esta licenciado sob MIT. Veja [LICENSE](LICENSE).
+Este projeto está licenciado sob MIT. Veja [LICENSE](LICENSE).

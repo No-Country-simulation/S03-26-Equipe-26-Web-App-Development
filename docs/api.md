@@ -8,11 +8,11 @@ Este documento consolida o contrato HTTP atual do backend na branch `dev`.
 - Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 - OpenAPI: `http://localhost:8080/v3/api-docs`
 
-## Autenticacao e Controle de Acesso
+## Autenticação e Controle de Acesso
 
 Matriz de acesso atual (`SecurityConfig`):
 
-- Rotas publicas:
+- Rotas públicas:
 - `POST /auth/**`
 - `GET /v3/api-docs/**`
 - `GET /swagger-ui/**`
@@ -21,7 +21,7 @@ Matriz de acesso atual (`SecurityConfig`):
 - `GET /traffic/traffic-volume-area`
 - `GET /traffic/sptrans/posicao`
 - Rotas autenticadas (JWT Bearer):
-- `GET|POST /traffic/**` (exceto rotas publicas explicitadas acima)
+- `GET|POST /traffic/**` (exceto rotas públicas explicitadas acima)
 - `GET|POST /api/**`
 - `GET /insights`
 
@@ -29,11 +29,11 @@ Para rotas autenticadas, enviar:
 
 - Header `Authorization: Bearer <token>`
 
-## Endpoints de Autenticacao
+## Endpoints de Autenticação
 
 ### `POST /auth/register`
 
-Cria usuario local (provider `LOCAL`) e retorna token JWT.
+Cria usuário local (provider `LOCAL`) e retorna token JWT.
 
 Exemplo de body:
 
@@ -58,7 +58,7 @@ Autentica credenciais locais e retorna token JWT.
 
 ### `POST /auth/google`
 
-Autenticacao federada via Google ID Token.
+Autenticação federada via Google ID Token.
 
 ```json
 {
@@ -66,15 +66,15 @@ Autenticacao federada via Google ID Token.
 }
 ```
 
-## Endpoints de Trafego (`/traffic`)
+## Endpoints de Tráfego (`/traffic`)
 
 ### `POST /traffic/load`
 
-Executa ingestao de dados da SPTrans (`/Corredor`) e persiste registros no banco.
+Executa ingestão de dados da SPTrans (`/Corredor`) e persiste registros no banco.
 
-Observacao:
+Observação:
 
-- Nao carrega `traffic_data.json` nesse fluxo atual.
+- Não carrega `traffic_data.json` nesse fluxo atual.
 
 ### `GET /traffic`
 
@@ -84,9 +84,9 @@ Retorna lista de `TrafficResponse`.
 
 Persiste um `TrafficData` recebido no corpo.
 
-Observacao:
+Observação:
 
-- No estado atual, recebe entidade diretamente (nao DTO de criacao).
+- No estado atual, recebe entidade diretamente (não DTO de criação).
 
 ### `GET /traffic/filter`
 
@@ -94,7 +94,7 @@ Filtros opcionais por query params:
 
 - `clima` (enum `Climate`)
 - `nivel` (double, `>=`)
-- `alerta` (texto, comparacao case-insensitive sobre o nome do enum)
+- `alerta` (texto, comparação case-insensitive sobre o nome do enum)
 
 Exemplo:
 
@@ -104,21 +104,21 @@ curl "http://localhost:8080/traffic/filter?clima=NORMAL&nivel=30&alerta=ANOMALIA
 
 ### `GET /traffic/insights`
 
-Resumo analitico (`TrafficInsightsResponse`):
+Resumo analítico (`TrafficInsightsResponse`):
 
 - total de registros
-- horario de pico
+- horário de pico
 - volume no pico
 - via mais movimentada
-- media da via mais movimentada
+- média da via mais movimentada
 
 ### `GET /traffic/news?query=...`
 
-Retorna payload JSON de noticias relacionadas a transito.
+Retorna payload JSON de notícias relacionadas a trânsito.
 
-Observacao:
+Observação:
 
-- Implementacao atual utiliza retorno mock (`news: []`).
+- Implementação atual utiliza retorno mock (`news: []`).
 
 ### `GET /traffic/dashboard?q=...&clima=...&nivel=...`
 
@@ -126,17 +126,17 @@ Retorna agregado assíncrono (`CompletableFuture<DashboardDTO>`) com:
 
 - insights
 - dados filtrados
-- bloco de noticias
+- bloco de notícias
 
 ### `GET /traffic/sptrans?endpoint=Posicao`
 
-Proxy HTTP generico para SPTrans.
+Proxy HTTP genérico para SPTrans.
 
 ### `GET /traffic/sptrans/posicao`
 
-Busca posicao de onibus na SPTrans.
+Busca posição de ônibus na SPTrans.
 
-Observacao:
+Observação:
 
 - Em indisponibilidade do provedor externo, retorna payload mock de fallback.
 
@@ -144,19 +144,19 @@ Observacao:
 
 Calcula rota e retorna `RouteResponse`.
 
-Observacao:
+Observação:
 
-- Logica atual opera em modo mock controlado.
+- Lógica atual opera em modo mock controlado.
 
 ### `GET /traffic/traffic-volume?lat=...&lon=...`
 
-Consulta volume de trafego por coordenada (`TrafficVolumeResponse[]`), com tentativa em TomTom e fallback estimado.
+Consulta volume de tráfego por coordenada (`TrafficVolumeResponse[]`), com tentativa em TomTom e fallback estimado.
 
 ### `GET /traffic/traffic-volume-area`
 
-Consulta volume de trafego para areas pre-definidas.
+Consulta volume de tráfego para áreas predefinidas.
 
-Observacao:
+Observação:
 
 - Controller retorna mock diretamente no estado atual da branch.
 
@@ -230,8 +230,8 @@ Campos principais:
 - `currentSpeed`, `freeFlowSpeed`
 - `status`, `confidence`
 
-## Observacoes para Demo Day
+## Observações para Demo Day
 
-- Parte dos endpoints opera com fallback/mock em funcao de dependencias externas.
-- A matriz de acesso (publico vs autenticado) deve ser respeitada durante validacoes de contrato.
-- Recomendacao de validacao funcional: `auth`, `traffic/insights`, `traffic-volume` e `dashboard`.
+- Parte dos endpoints opera com fallback/mock em função de dependências externas.
+- A matriz de acesso (público vs autenticado) deve ser respeitada durante validações de contrato.
+- Recomendação de validação funcional: `auth`, `traffic/insights`, `traffic-volume` e `dashboard`.
