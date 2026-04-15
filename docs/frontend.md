@@ -1,63 +1,94 @@
 # Frontend
 
-Este documento descreve o estado atual do frontend da aplicação.
+Este documento descreve o estado atual da camada frontend na branch `dev`.
 
 ## Stack
 
 - React 19
 - Vite 8
 - ESLint
+- Leaflet 1.9.4
+- React-Leaflet 5.0.0
 
-## Estrutura Relevante
+## Estrutura principal
 
-Arquivos principais:
+- `frontend/src/App.jsx`
+- `frontend/src/pages/home/Home.jsx`
+- `frontend/src/pages/login/Login.jsx`
+- `frontend/src/utils/*` (graficos)
 
-- [frontend/src/App.jsx](../frontend/src/App.jsx)
-- [frontend/src/pages/home/Home.jsx](../frontend/src/pages/home/Home.jsx)
-- [frontend/package.json](../frontend/package.json)
+## Estado atual da interface
 
-## Estado Atual da Interface
+### App
 
-Hoje o frontend entrega:
+`App.jsx` alterna entre Home e Login por estado local:
 
-- tela inicial com identidade visual do projeto
-- alternância entre seleção por `LOCAL` e `TRAJETO`
-- campos de entrada para localização e origem/destino
-- renderização de mapa com Leaflet usando tiles do OpenStreetMap
+- `statusLogin = false` => renderiza Home
+- `statusLogin = true` => renderiza Login
 
-## Fluxo Atual
+No estado atual, a Home e a tela inicial exibida por padrao.
 
-```mermaid
-flowchart LR
-    U[Usuário] --> H[Home.jsx]
-    H --> O[Seleção LOCAL ou TRAJETO]
-    H --> I[Inputs de busca]
-    H --> M[Mapa Leaflet]
-    M --> OSM[OpenStreetMap Tiles]
-```
+### Home
 
-## Observações Importantes
+A tela Home entrega:
 
-- o frontend atual ainda não mostra chamadas explícitas para a API do backend na `dev`
-- a branch `frontend` já teve uma tentativa inicial de integração com `/traffic/insights` e `/traffic/filter`, mas isso ainda não foi consolidado na `dev`
-- a dependência `leaflet` e seu CSS são importados em `Home.jsx`, mas não aparecem declarados em `frontend/package.json`
-- o `frontend/README.md` ainda está no template padrão do Vite e pode ser atualizado depois, se o time quiser documentação interna por pasta
+- identidade visual do projeto
+- selecao `LOCAL` x `TRAJETO`
+- listagem e detalhe de dados com modal
+- visualizacoes graficas (barra, linha, pizza) via utilitarios locais
 
-## Como Executar
+Fonte de dados atual da Home:
 
-No diretório `frontend`:
+- import direto de `traffic_data.json` da raiz
+
+Observacao importante:
+
+- chamadas `fetch` para backend existem no codigo, mas estao desativadas (comentadas).
+
+### Login
+
+A tela Login possui:
+
+- layout de login
+- botao de conta Google
+
+Observacao:
+
+- a integracao efetiva de login com backend ainda nao esta conectada ao fluxo de navegacao da UI.
+
+## Integracao com API (status)
+
+- Integracao parcial / em evolucao
+- Backend possui endpoints prontos, porem o frontend ainda utiliza majoritariamente dados locais
+- Integracoes prioritarias:
+- `/auth/login`
+- `/traffic/insights`
+- `/traffic/filter`
+- `/traffic/traffic-volume-area`
+
+## Como executar
+
+No diretorio `frontend`:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Endereço local padrão:
+Ambiente local padrao:
 
 - `http://localhost:5173`
 
-## Próximos Passos Recomendados
+## Dependencias confirmadas no `package.json`
 
-- declarar formalmente `leaflet` no `package.json`
-- integrar o frontend com os endpoints do backend
-- documentar rotas de tela, estados e componentes conforme a UI crescer
+- `react`
+- `react-dom`
+- `leaflet`
+- `react-leaflet`
+
+## Riscos e ajustes recomendados para Demo Day
+
+1. Conectar Home com `GET /traffic` e `GET /traffic/insights` (retirar dependencia do JSON local para o fluxo principal).
+2. Conectar Login com `POST /auth/login` e armazenamento de token para chamadas autenticadas.
+3. Definir variavel de ambiente de frontend para base URL da API.
+4. Atualizar `frontend/README.md` (atualmente template padrao do Vite).

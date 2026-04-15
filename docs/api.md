@@ -1,259 +1,237 @@
 # API
 
-Este documento concentra os endpoints, o comportamento atual e o contrato principal do backend.
+Este documento consolida o contrato HTTP atual do backend na branch `dev`.
 
 ## Base URL
 
-Ambiente local padrão:
+- Local: `http://localhost:8080`
+- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+- OpenAPI: `http://localhost:8080/v3/api-docs`
 
-- `http://localhost:8080`
+## Autenticacao e Controle de Acesso
 
-Base path atual:
+Matriz de acesso atual (`SecurityConfig`):
 
-- `/traffic`
+- Rotas publicas:
+- `POST /auth/**`
+- `GET /v3/api-docs/**`
+- `GET /swagger-ui/**`
+- `GET /swagger-ui.html`
+- `GET /traffic/traffic-volume`
+- `GET /traffic/traffic-volume-area`
+- `GET /traffic/sptrans/posicao`
+- Rotas autenticadas (JWT Bearer):
+- `GET|POST /traffic/**` (exceto rotas publicas explicitadas acima)
+- `GET|POST /api/**`
+- `GET /insights`
 
-## Endpoints Disponíveis
+Para rotas autenticadas, enviar:
 
-### `GET /traffic`
+- Header `Authorization: Bearer <token>`
 
-Retorna todos os registros persistidos em formato simplificado para o frontend.
+## Endpoints de Autenticacao
 
-Exemplo:
+### `POST /auth/register`
 
-```bash
-curl http://localhost:8080/traffic
-```
+Cria usuario local (provider `LOCAL`) e retorna token JWT.
 
-### `GET /traffic/filter`
-
-Filtra registros com base nos parâmetros atualmente suportados pelo backend.
-
-Parâmetros opcionais:
-
-- `clima`
-- `nivel`
-- `alerta`
-
-Exemplos:
-
-```bash
-curl "http://localhost:8080/traffic/filter?clima=CHUVA_LEVE"
-```
-
-```bash
-curl "http://localhost:8080/traffic/filter?nivel=70"
-```
-
-```bash
-curl "http://localhost:8080/traffic/filter?alerta=ANOMALIA"
-```
-
-Comportamento atual:
-
-- se `clima` e `nivel` forem enviados juntos, o backend usa `findByClimaAndNivelGreaterThan(...)`
-- se apenas `clima` for enviado, usa `findByClima(...)`
-- se apenas `nivel` for enviado, usa `findByNivelGreaterThan(...)`
-- se apenas `alerta` for enviado, usa `findByAlerta(...)`
-- sem parâmetros, retorna todos os registros
-
-### `POST /traffic`
-
-Cria um novo registro manualmente usando DTO próprio de entrada e validação.
-
-Payload de exemplo:
+Exemplo de body:
 
 ```json
 {
-  "idvia": 999,
-  "nome": "Via de Teste",
-  "tipo": "arterial",
-  "hora": "2026-03-31T08:00:00",
-  "clima": "limpo",
-  "volume": 250,
-  "capacidade": 1000,
-  "nivel": 25.0,
-  "status": "FLUIDO",
-  "alerta": "NORMAL",
-  "lat": -23.5505,
-  "lng": -46.6333
+  "nome": "Maria",
+  "email": "maria@email.com",
+  "senha": "123456"
 }
 ```
 
-Validações básicas:
+### `POST /auth/login`
 
-- `idvia` é obrigatório
-- `nome` é obrigatório
-- `tipo` é obrigatório
-- `hora` é obrigatória
-- `volume` deve ser maior que zero
-- `capacidade` deve ser maior que zero
-- `nivel` deve ser maior ou igual a zero
-- `alerta` é obrigatório
-- `lat` e `lng` devem ser enviados juntos quando houver localização
+Autentica credenciais locais e retorna token JWT.
 
-Observações:
+```json
+{
+  "email": "maria@email.com",
+  "senha": "123456"
+}
+```
 
-- o endpoint não recebe mais `TrafficData` diretamente
-- a resposta do `POST` usa `TrafficResponse`
-- `tipo` e `clima` seguem o formato serializado atual da API, em minúsculas
-- a geometria interna continua sendo persistida como `geom`, mas o contrato externo expõe apenas `lat` e `lng`
+### `POST /auth/google`
+
+Autenticacao federada via Google ID Token.
+
+```json
+{
+  "idToken": "TOKEN_GOOGLE"
+}
+```
+
+## Endpoints de Trafego (`/traffic`)
 
 ### `POST /traffic/load`
 
-Tenta carregar dados de um arquivo JSON e persistí-los evitando duplicidade por `idvia + hora`.
+Executa ingestao de dados da SPTrans (`/Corredor`) e persiste registros no banco.
 
-Fluxo implementado:
+Observacao:
 
-1. o controller chama `TrafficService.loadData()`
-2. o service lê `traffic_data.json` do classpath em uma lista de `TrafficDataDTO`
-3. cada DTO é convertido para `TrafficData`
-4. `lat/lng` são convertidos em `Point`
-5. o registro só é salvo se `existsByIdviaAndHora(...)` retornar falso
+- Nao carrega `traffic_data.json` nesse fluxo atual.
 
-Estado atual:
+### `GET /traffic`
 
-- a implementação existe
-- o arquivo JSON exigido por esse fluxo ainda não está em `backend/src/main/resources`
-- na prática, a carga inicial operacional continua acontecendo via `import.sql`
+Retorna lista de `TrafficResponse`.
+
+### `POST /traffic`
+
+Persiste um `TrafficData` recebido no corpo.
+
+Observacao:
+
+- No estado atual, recebe entidade diretamente (nao DTO de criacao).
+
+### `GET /traffic/filter`
+
+Filtros opcionais por query params:
+
+- `clima` (enum `Climate`)
+- `nivel` (double, `>=`)
+- `alerta` (texto, comparacao case-insensitive sobre o nome do enum)
+
+Exemplo:
+
+```bash
+curl "http://localhost:8080/traffic/filter?clima=NORMAL&nivel=30&alerta=ANOMALIA"
+```
 
 ### `GET /traffic/insights`
 
-Retorna insights simples para o MVP com base nos registros persistidos.
+Resumo analitico (`TrafficInsightsResponse`):
 
-Resposta atual:
+- total de registros
+- horario de pico
+- volume no pico
+- via mais movimentada
+- media da via mais movimentada
 
-- `totalRegistros`: quantidade total de registros persistidos
-- `horarioPico`: hora com maior soma de volume
-- `volumeHorarioPico`: soma de volume no horário de pico
-- `viaMaisMovimentada`: via com maior média de volume
-- `mediaVolumeViaMaisMovimentada`: média de volume da via mais movimentada
+### `GET /traffic/news?query=...`
 
-Exemplo:
+Retorna payload JSON de noticias relacionadas a transito.
+
+Observacao:
+
+- Implementacao atual utiliza retorno mock (`news: []`).
+
+### `GET /traffic/dashboard?q=...&clima=...&nivel=...`
+
+Retorna agregado assíncrono (`CompletableFuture<DashboardDTO>`) com:
+
+- insights
+- dados filtrados
+- bloco de noticias
+
+### `GET /traffic/sptrans?endpoint=Posicao`
+
+Proxy HTTP generico para SPTrans.
+
+### `GET /traffic/sptrans/posicao`
+
+Busca posicao de onibus na SPTrans.
+
+Observacao:
+
+- Em indisponibilidade do provedor externo, retorna payload mock de fallback.
+
+### `GET /traffic/route?cidade=...&origem=...&destino=...&modo=transit`
+
+Calcula rota e retorna `RouteResponse`.
+
+Observacao:
+
+- Logica atual opera em modo mock controlado.
+
+### `GET /traffic/traffic-volume?lat=...&lon=...`
+
+Consulta volume de trafego por coordenada (`TrafficVolumeResponse[]`), com tentativa em TomTom e fallback estimado.
+
+### `GET /traffic/traffic-volume-area`
+
+Consulta volume de trafego para areas pre-definidas.
+
+Observacao:
+
+- Controller retorna mock diretamente no estado atual da branch.
+
+## Endpoint adicional de Insights
+
+### `GET /insights`
+
+Endpoint alternativo de insights disponibilizado por `TrafficInsightsController`.
+
+## Endpoints de Transporte
+
+Base path: `/api/transporte`
+
+- `GET /api/transporte/cidades`
+- `GET /api/transporte/stops/{cidade}?limit=100&offset=0`
+- `GET /api/transporte/routes/{cidade}?limit=50`
+- `GET /api/transporte/stops/{cidade}/nearby?lat=...&lon=...&radius=1.0`
+- `POST /api/transporte/calculate-route`
+
+Body de `calculate-route`:
 
 ```json
 {
-  "totalRegistros": 72,
-  "horarioPico": "2026-03-28T18:00:00",
-  "volumeHorarioPico": 1919,
-  "viaMaisMovimentada": "Rodovia do Aeroporto",
-  "mediaVolumeViaMaisMovimentada": 568.46
+  "origin": "Av Paulista, Sao Paulo",
+  "destination": "Aeroporto de Congonhas, Sao Paulo",
+  "cidade": "sao-paulo"
 }
 ```
 
-### `GET /traffic/aggregations`
+## Endpoints GTFS
 
-Retorna agregações simples para o MVP com base nos registros persistidos.
+Base path: `/api/gtfs`
 
-Resposta atual:
+- `GET /api/gtfs/cidades`
+- `GET /api/gtfs/stops/{cidade}`
+- `GET /api/gtfs/routes/{cidade}`
+- `GET /api/gtfs/heatmap/{cidade}`
 
-- `volumePorHorario`: média de volume por horário
-- `volumePorTipoVia`: agrupamento por tipo de via com quantidade de registros e média de volume
+## Endpoints de Analytics
 
-Exemplo:
+- `GET /api/analytics/crowd-flow`
 
-```json
-{
-  "volumePorHorario": [
-    {
-      "hora": "08:00",
-      "mediaVolume": 454.33
-    }
-  ],
-  "volumePorTipoVia": [
-    {
-      "tipoVia": "ARTERIAL",
-      "quantidade": 24,
-      "mediaVolume": 320.5
-    }
-  ]
-}
-```
+## Endpoints de Clima
 
-## Fluxo de Consulta
+Base path: `/api/test/clima`
 
-```mermaid
-sequenceDiagram
-    participant Client as Cliente
-    participant Controller as TrafficController
-    participant Service as TrafficService
-    participant Repo as TrafficRepository
-    participant DB as H2/H2GIS
+- `GET /api/test/clima?lat=...&lon=...`
+- `GET /api/test/clima/atual?lat=...&lon=...`
 
-    Client->>Controller: GET /traffic/filter?clima=LIMPO&nivel=70
-    Controller->>Service: findByFilters(clima, nivel, alerta)
-    Service->>Repo: findByClimaAndNivelGreaterThan(...)
-    Repo->>DB: SELECT com filtros
-    DB-->>Repo: registros
-    Repo-->>Service: List<TrafficData>
-    Service-->>Controller: List<TrafficResponse>
-    Controller-->>Client: 200 OK + JSON
-```
+## DTOs de Resposta importantes
 
-## Modelo Atual da Entidade
+### `TrafficResponse`
 
-```mermaid
-classDiagram
-    class TrafficData {
-        +Long id
-        +Integer idvia
-        +String nome
-        +TypeOfRoute tipo
-        +LocalDateTime hora
-        +Climate clima
-        +int volume
-        +int capacidade
-        +double nivel
-        +StatusTrafego status
-        +TrafficAlert alerta
-        +Point geom
-    }
-```
+Campos principais:
 
-## Resposta Simplificada da API
+- `id`, `idvia`, `nome`, `tipo`, `hora`
+- `clima`, `volume`, `capacidade`, `nivel`, `status`, `alerta`
+- `lat`, `lng`
 
-Os endpoints `GET /traffic`, `GET /traffic/filter` e `POST /traffic` retornam um payload simplificado para facilitar o consumo no frontend.
+### `TrafficInsightsResponse`
 
-A resposta não expõe o objeto bruto de `geom`. Quando houver localização, o backend retorna apenas:
+- `totalRegistros`
+- `horarioPico`
+- `volumeHorarioPico`
+- `viaMaisMovimentada`
+- `mediaVolumeViaMaisMovimentada`
 
-- `lat`
-- `lng`
+### `TrafficVolumeResponse`
 
-Exemplo:
+- `location`, `hour`, `volume`
+- `currentSpeed`, `freeFlowSpeed`
+- `status`, `confidence`
 
-```json
-[
-  {
-    "id": 1,
-    "idvia": 1,
-    "nome": "Av. Central",
-    "tipo": "arterial",
-    "hora": "2026-03-28T00:00:00",
-    "clima": null,
-    "volume": 202,
-    "capacidade": 1000,
-    "nivel": 20.2,
-    "status": null,
-    "alerta": "NORMAL",
-    "lat": -23.5505,
-    "lng": -46.6333
-  }
-]
-```
+## Observacoes para Demo Day
 
-## Filtro por Alerta
-
-O endpoint `GET /traffic/filter?alerta=ANOMALIA` usa o tipo correto do domínio no backend.
-
-Com isso:
-
-- o filtro deixa de depender de comparação incorreta por `String`
-- valores inválidos de alerta passam a ser tratados como erro de requisição
-
-## Dependências Relevantes do Backend
-
-- Spring Boot Web
-- Spring Data JPA
-- H2
-- Hibernate Spatial
-- H2GIS
-- Springdoc OpenAPI
+- Parte dos endpoints opera com fallback/mock em funcao de dependencias externas.
+- A matriz de acesso (publico vs autenticado) deve ser respeitada durante validacoes de contrato.
+- Recomendacao de validacao funcional: `auth`, `traffic/insights`, `traffic-volume` e `dashboard`.

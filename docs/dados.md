@@ -1,98 +1,86 @@
 # Dados
 
-Este documento resume a lógica de geração, os formatos de massa de dados e os pontos de atenção entre scripts auxiliares, DTOs e entidade persistida.
+Este documento descreve o estado atual das fontes de dados, contratos e pipeline de persistencia da aplicacao.
 
-## Fontes de Dados no Projeto
+## Fontes de dados no repositorio
 
-Hoje o repositório possui duas frentes principais de dados:
+Atualmente existem multiplas fontes de dados com papeis distintos:
 
-- `backend/src/main/resources/import.sql`, usado no boot da aplicação para carga inicial da tabela `traffic_data`
-- `traffic_data.json` na raiz, usado como base para scripts auxiliares, mas ainda não encaixado no classpath oficial do backend
-
-Arquivos relacionados:
-
-- `generator.py`
-- `traffic_data.json`
 - `backend/src/main/resources/import.sql`
-- [TrafficDataDTO.java](../backend/src/main/java/br/com/smartTrafficFlow/Smart_Traffic_Flow/dto/TrafficDataDTO.java)
+- `backend/src/main/resources/traffic_data.json`
+- `traffic_data.json` (raiz)
+- `generator.py` (geracao auxiliar)
 
-## Lógica de Simulação
+## O que o backend usa no estado atual
 
-O motor de simulação considera:
+### Persistencia principal
 
-- picos comerciais em `08:00` e `18:00` para vias arteriais
-- picos logísticos na madrugada e no fim da noite para a rodovia do aeroporto
-- eventos aleatórios para simular incidentes ou anomalias operacionais
+- Banco: PostgreSQL (`application.properties`)
+- Entidade: `TrafficData`
+- Tabela: `traffic_data`
 
-## Formato Atual do DTO de Carga
+### Carga via endpoint
 
-O backend hoje espera um contrato próximo deste em `TrafficDataDTO`:
+- `POST /traffic/load` chama `TrafficService.loadData()`
+- Fluxo atual consome SPTrans (`/Corredor`) e nao JSON local
 
-| Campo | Tipo | Observação |
-| :--- | :--- | :--- |
-| `idvia` | `Integer` | identificador da via |
-| `nome` | `String` | nome da via |
-| `tipo` | `TypeOfRoute` | enum |
-| `hora` | `String` | faixa horária |
-| `clima` | `Climate` | enum |
-| `volume` | `int` | volume medido |
-| `capacidade` | `int` | capacidade da via |
-| `nivel` | `double` | nível de ocupação |
-| `status` | `StatusTrafego` | enum |
-| `alerta` | `TrafficAlert` | enum |
-| `lat` | `Double` | latitude para gerar `geom` |
-| `lng` | `Double` | longitude para gerar `geom` |
+### Massa SQL
 
-## Modelo Persistido Pela API
+- Existe `import.sql` com registros de trafego e geometria (`POINT`)
+- Mantido como baseline para ambiente local e testes de consistencia
 
-```mermaid
-erDiagram
-    TRAFFIC_DATA {
-        BIGINT id PK
-        INT idvia
-        VARCHAR nome
-        VARCHAR tipo
-        VARCHAR hora
-        VARCHAR clima
-        INT volume
-        INT capacidade
-        DOUBLE nivel
-        VARCHAR status
-        VARCHAR alerta
-        GEOMETRY geom
-    }
-```
+## Modelo de dado persistido (`TrafficData`)
 
-## Pipeline Atual de Carga
+Campos principais:
 
-```mermaid
-flowchart LR
-    A[traffic_data.json] --> B[TrafficDataDTO]
-    B --> C[TrafficService]
-    C --> D[TrafficData]
-    D --> E[geom Point 4326]
-    D --> F[(traffic_data)]
-```
+- `id` (PK)
+- `idvia`
+- `nome`
+- `tipo` (`TypeOfRoute`)
+- `hora` (`LocalDateTime`)
+- `clima` (`Climate`)
+- `volume`
+- `capacidade`
+- `nivel`
+- `status` (`StatusTrafego`)
+- `alerta` (`TrafficAlert`)
+- `geom` (`Point`, SRID 4326)
 
-## Divergências Atuais
+Regra de integridade importante:
 
-Ainda existe uma lacuna entre a massa de dados da raiz e o contrato real esperado pelo backend:
+- unique constraint em `idvia + hora`
 
-- o JSON de apoio ainda não está dentro de `backend/src/main/resources`
-- a documentação histórica usava campos como `id_via`, enquanto o backend trabalha com `idvia`
-- o backend atual opera com enums e geometria, o que exige cuidado ao gerar ou importar dados
+## Contrato de carga por DTO (`TrafficDataDTO`)
 
-## Regras de Persistência
+Campos esperados pelo DTO:
 
-Já existe uma regra importante:
+- `idvia`, `nome`, `tipo`, `hora`
+- `clima`, `volume`, `capacidade`, `nivel`, `status`, `alerta`
+- `lat`, `lng`
 
-- restrição única em `idvia + hora`
+Observacao:
 
-Isso evita duplicidade lógica de medições para a mesma via no mesmo horário.
+- O DTO permanece util para carga JSON, mas o fluxo de `POST /traffic/load` na branch atual esta orientado a SPTrans.
 
-## Recomendações Para Evolução
+## Fluxo de transformacao para resposta da API
 
-- mover o JSON oficial de carga para `backend/src/main/resources`
-- padronizar definitivamente os nomes de campos entre scripts, JSON e backend
-- versionar o schema do dado de entrada
-- criar validação explícita para importação antes de persistir
+`TrafficData` -> `TrafficResponse`
+
+A resposta exposta para frontend prioriza:
+
+- metadados de via/trafego
+- coordenadas `lat/lng`
+- sem exposicao direta de `geom`
+
+## Divergencias e pontos de atencao
+
+- Existem arquivos de dados em duplicidade (raiz e `backend/resources`).
+- O fluxo historicamente documentado como JSON local nao representa mais o endpoint de carga atual.
+- Parte do comportamento depende de APIs externas (SPTrans, TomTom, geocoding), com fallback em caso de falha.
+
+## Recomendacoes tecnicas
+
+1. Definir oficialmente uma unica fonte de massa estatica (`import.sql` ou `traffic_data.json` versionado no backend).
+2. Documentar quando usar carga SPTrans vs massa local.
+3. Criar `schema` de entrada versionado para JSON (se o fluxo voltar a ser usado em producao).
+4. Evitar versionamento de dados sensiveis e tokens no repositorio.
