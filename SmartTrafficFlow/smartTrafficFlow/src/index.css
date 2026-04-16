@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "system-ui", "sans-serif";
+  --color-slate-950: #020617;
+}
+
+:root {
+  font-family: var(--font-sans);
+  background-color: #020617;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #020617;
+}
+
+#root {
+  height: 100%;
+}
+
+/* --- FIX PARA O MAPA --- */
+
+/* Remove as emendas brancas entre os blocos do mapa */
+.map-clean .leaflet-tile-container {
+  filter: brightness(0.7) contrast(1.2) grayscale(0.6);
+}
+
+.leaflet-container {
+  background-color: #020617 !important;
+  z-index: 1 !important; /* Mantém o mapa na base */
+  outline: none;
+}
+
+.leaflet-tile {
+  outline: 1px solid transparent;
+}
+
+/* Esconde o painel padrão de rotas */
+.leaflet-routing-container {
+  display: none !important;
+}
+
+/* Scrollbar Esmeralda */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 10px;
+}

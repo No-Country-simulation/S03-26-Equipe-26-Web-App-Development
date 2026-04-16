@@ -1,0 +1,45 @@
+
+[
+  {
+    "idvia": 1,
+    "nome": "Av. Central",
+    "tipo": "ARTERIAL",
+    "hora": "2026-03-28T08:00:00",
+    "clima": "LIMPO",
+    "volume": 500,
+    "capacidade": 1000,
+    "nivel": 50.0,
+    "status": "FLUIDO",
+    "alerta": "NORMAL",
+    "lat": -23.5505,
+    "lng": -46.6333
+  },
+  {
+    "idvia": 2,
+    "nome": "Rodovia do Aeroporto",
+    "tipo": "RODOVIA",
+    "hora": "2026-03-28T08:00:00",
+    "clima": "LIMPO",
+    "volume": 800,
+    "capacidade": 2000,
+    "nivel": 40.0,
+    "status": "FLUIDO",
+    "alerta": "NORMAL",
+    "lat": -23.4356,
+    "lng": -46.4731
+  },
+  {
+    "idvia": 3,
+    "nome": "Rua das Flores",
+    "tipo": "RESIDENCIAL",
+    "hora": "2026-03-28T08:00:00",
+    "clima": "CHUVA_LEVE",
+    "volume": 150,
+    "capacidade": 300,
+    "nivel": 50.0,
+    "status": "LENTO",
+    "alerta": "ATENCAO",
+    "lat": -23.5855,
+    "lng": -46.6765
+  }
+]
