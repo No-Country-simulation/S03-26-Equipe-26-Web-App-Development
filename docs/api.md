@@ -1,18 +1,23 @@
 # API
 
-Este documento consolida o contrato HTTP atual do backend na branch `dev`.
+Este documento descreve o contrato HTTP atual da branch `main`.
 
-## Base URL
+## Base URLs
 
-- Local: `http://localhost:8080`
+### Backend Java
+
+- Base: `http://localhost:8080`
 - Swagger UI: `http://localhost:8080/swagger-ui/index.html`
 - OpenAPI: `http://localhost:8080/v3/api-docs`
 
-## Autenticação e Controle de Acesso
+### Microservice Python
 
-Matriz de acesso atual (`SecurityConfig`):
+- Base: `http://localhost:8000`
 
-- Rotas públicas:
+## Autenticação e Controle de Acesso (Backend Java)
+
+Conforme `SecurityConfig`, rotas públicas:
+
 - `POST /auth/**`
 - `GET /v3/api-docs/**`
 - `GET /swagger-ui/**`
@@ -20,218 +25,151 @@ Matriz de acesso atual (`SecurityConfig`):
 - `GET /traffic/traffic-volume`
 - `GET /traffic/traffic-volume-area`
 - `GET /traffic/sptrans/posicao`
-- Rotas autenticadas (JWT Bearer):
-- `GET|POST /traffic/**` (exceto rotas públicas explicitadas acima)
+
+Rotas autenticadas (JWT Bearer):
+
+- `GET|POST /traffic/**` (exceto as rotas públicas listadas acima)
 - `GET|POST /api/**`
 - `GET /insights`
 
-Para rotas autenticadas, enviar:
+Header esperado nas rotas autenticadas:
 
-- Header `Authorization: Bearer <token>`
+- `Authorization: Bearer <token>`
 
-## Endpoints de Autenticação
+## Endpoints do Backend Java
 
-### `POST /auth/register`
+### Autenticação (`/auth`)
 
-Cria usuário local (provider `LOCAL`) e retorna token JWT.
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/google`
 
-Exemplo de body:
+Observação importante:
 
-```json
-{
-  "nome": "Maria",
-  "email": "maria@email.com",
-  "senha": "123456"
-}
-```
+- `GET /auth/verify` **não existe** no backend atual.
 
-### `POST /auth/login`
+### Tráfego (`/traffic`)
 
-Autentica credenciais locais e retorna token JWT.
+- `POST /traffic/load`
+- `GET /traffic`
+- `POST /traffic`
+- `GET /traffic/filter?clima=&nivel=&alerta=`
+- `GET /traffic/insights`
+- `GET /traffic/news?query=`
+- `GET /traffic/dashboard?q=&clima=&nivel=`
+- `GET /traffic/sptrans?endpoint=`
+- `GET /traffic/sptrans/posicao`
+- `GET /traffic/route?cidade=&origem=&destino=&modo=`
+- `GET /traffic/traffic-volume?lat=&lon=`
+- `GET /traffic/traffic-volume-area`
 
-```json
-{
-  "email": "maria@email.com",
-  "senha": "123456"
-}
-```
+Comportamentos atuais relevantes:
 
-### `POST /auth/google`
+- `GET /traffic/news` retorna mock (`news: []`).
+- `GET /traffic/sptrans/posicao` possui fallback mock em caso de falha externa.
+- `GET /traffic/route` hoje retorna resposta mock controlada.
+- `GET /traffic/traffic-volume` tenta TomTom e aplica fallback estimado.
+- `GET /traffic/traffic-volume-area` retorna mock no controller.
 
-Autenticação federada via Google ID Token.
+### Insights adicional
 
-```json
-{
-  "idToken": "TOKEN_GOOGLE"
-}
-```
+- `GET /insights`
 
-## Endpoints de Tráfego (`/traffic`)
-
-### `POST /traffic/load`
-
-Executa ingestão de dados da SPTrans (`/Corredor`) e persiste registros no banco.
-
-Observação:
-
-- Não carrega `traffic_data.json` nesse fluxo atual.
-
-### `GET /traffic`
-
-Retorna lista de `TrafficResponse`.
-
-### `POST /traffic`
-
-Persiste um `TrafficData` recebido no corpo.
-
-Observação:
-
-- No estado atual, recebe entidade diretamente (não DTO de criação).
-
-### `GET /traffic/filter`
-
-Filtros opcionais por query params:
-
-- `clima` (enum `Climate`)
-- `nivel` (double, `>=`)
-- `alerta` (texto, comparação case-insensitive sobre o nome do enum)
-
-Exemplo:
-
-```bash
-curl "http://localhost:8080/traffic/filter?clima=NORMAL&nivel=30&alerta=ANOMALIA"
-```
-
-### `GET /traffic/insights`
-
-Resumo analítico (`TrafficInsightsResponse`):
-
-- total de registros
-- horário de pico
-- volume no pico
-- via mais movimentada
-- média da via mais movimentada
-
-### `GET /traffic/news?query=...`
-
-Retorna payload JSON de notícias relacionadas a trânsito.
-
-Observação:
-
-- Implementação atual utiliza retorno mock (`news: []`).
-
-### `GET /traffic/dashboard?q=...&clima=...&nivel=...`
-
-Retorna agregado assíncrono (`CompletableFuture<DashboardDTO>`) com:
-
-- insights
-- dados filtrados
-- bloco de notícias
-
-### `GET /traffic/sptrans?endpoint=Posicao`
-
-Proxy HTTP genérico para SPTrans.
-
-### `GET /traffic/sptrans/posicao`
-
-Busca posição de ônibus na SPTrans.
-
-Observação:
-
-- Em indisponibilidade do provedor externo, retorna payload mock de fallback.
-
-### `GET /traffic/route?cidade=...&origem=...&destino=...&modo=transit`
-
-Calcula rota e retorna `RouteResponse`.
-
-Observação:
-
-- Lógica atual opera em modo mock controlado.
-
-### `GET /traffic/traffic-volume?lat=...&lon=...`
-
-Consulta volume de tráfego por coordenada (`TrafficVolumeResponse[]`), com tentativa em TomTom e fallback estimado.
-
-### `GET /traffic/traffic-volume-area`
-
-Consulta volume de tráfego para áreas predefinidas.
-
-Observação:
-
-- Controller retorna mock diretamente no estado atual da branch.
-
-## Endpoint adicional de Insights
-
-### `GET /insights`
-
-Endpoint alternativo de insights disponibilizado por `TrafficInsightsController`.
-
-## Endpoints de Transporte
-
-Base path: `/api/transporte`
+### Transporte (`/api/transporte`)
 
 - `GET /api/transporte/cidades`
 - `GET /api/transporte/stops/{cidade}?limit=100&offset=0`
 - `GET /api/transporte/routes/{cidade}?limit=50`
-- `GET /api/transporte/stops/{cidade}/nearby?lat=...&lon=...&radius=1.0`
+- `GET /api/transporte/stops/{cidade}/nearby?lat=&lon=&radius=1.0`
 - `POST /api/transporte/calculate-route`
 
-Body de `calculate-route`:
-
-```json
-{
-  "origin": "Av Paulista, Sao Paulo",
-  "destination": "Aeroporto de Congonhas, Sao Paulo",
-  "cidade": "sao-paulo"
-}
-```
-
-## Endpoints GTFS
-
-Base path: `/api/gtfs`
+### GTFS Java (`/api/gtfs`)
 
 - `GET /api/gtfs/cidades`
 - `GET /api/gtfs/stops/{cidade}`
 - `GET /api/gtfs/routes/{cidade}`
 - `GET /api/gtfs/heatmap/{cidade}`
 
-## Endpoints de Analytics
+### Analytics Java (`/api/analytics`)
 
 - `GET /api/analytics/crowd-flow`
 
-## Endpoints de Clima
+### Clima Java (`/api/test/clima`)
 
-Base path: `/api/test/clima`
+- `GET /api/test/clima?lat=&lon=`
+- `GET /api/test/clima/atual?lat=&lon=`
 
-- `GET /api/test/clima?lat=...&lon=...`
-- `GET /api/test/clima/atual?lat=...&lon=...`
+## Endpoints do Microservice Python
 
-## DTOs de Resposta importantes
+### GTFS (`/gtfs`)
 
-### `TrafficResponse`
+- `GET /gtfs/cidades`
+- `GET /gtfs/stops/{cidade}`
+- `GET /gtfs/routes/{cidade}`
+- `GET /gtfs/stops/nearby/{cidade}?lat=&lon=&raio_km=`
+- `GET /gtfs/public-transit?origin_lat=&origin_lon=&destination_lat=&destination_lon=&cidade=`
+- `GET /gtfs/bus-route?bus_line=&origin_lat=&origin_lon=&destination_lat=&destination_lon=&cidade=`
+- `GET /gtfs/health`
 
-Campos principais:
+### Analytics (`/analytics`)
 
-- `id`, `idvia`, `nome`, `tipo`, `hora`
-- `clima`, `volume`, `capacidade`, `nivel`, `status`, `alerta`
-- `lat`, `lng`
+- `GET /analytics/analise/{cidade}`
+- `GET /analytics/analise/todas`
+- `GET /analytics/heatmap/{cidade}?hora_inicio=&hora_fim=`
 
-### `TrafficInsightsResponse`
+Observação importante:
 
-- `totalRegistros`
-- `horarioPico`
-- `volumeHorarioPico`
-- `viaMaisMovimentada`
-- `mediaVolumeViaMaisMovimentada`
+- `GET /analytics/forecast` **não existe** no microservice atual.
 
-### `TrafficVolumeResponse`
+## Divergências conhecidas com chamadas do frontend
 
-- `location`, `hour`, `volume`
-- `currentSpeed`, `freeFlowSpeed`
-- `status`, `confidence`
+No arquivo `SmartTrafficFlow/smartTrafficFlow/src/services/api.js` existem chamadas sem endpoint correspondente hoje:
 
-## Observações para Demo Day
+- `GET /auth/verify`
+- `POST /traffic/history`
+- `GET /traffic/dashboard-complete`
+- `GET /analytics/forecast`
 
-- Parte dos endpoints opera com fallback/mock em função de dependências externas.
-- A matriz de acesso (público vs autenticado) deve ser respeitada durante validações de contrato.
-- Recomendação de validação funcional: `auth`, `traffic/insights`, `traffic-volume` e `dashboard`.
+## Roteiro rápido de teste para avaliador
+
+1. Verificar saúde dos serviços:
+
+```bash
+curl http://localhost:8080/v3/api-docs
+curl http://localhost:8000/
+```
+
+2. Criar usuário:
+
+```bash
+curl -X POST http://localhost:8080/auth/register \
+  -H "Content-Type: application/json" \
+  -d "{\"nome\":\"Avaliador\",\"email\":\"avaliador@example.com\",\"senha\":\"123456\"}"
+```
+
+3. Fazer login e copiar o token:
+
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"avaliador@example.com\",\"senha\":\"123456\"}"
+```
+
+4. Testar rota autenticada:
+
+```bash
+curl http://localhost:8080/traffic \
+  -H "Authorization: Bearer SEU_TOKEN"
+```
+
+5. Testar rota pública de volume:
+
+```bash
+curl "http://localhost:8080/traffic/traffic-volume?lat=-23.5505&lon=-46.6333"
+```
+
+6. Testar GTFS no microservice:
+
+```bash
+curl "http://localhost:8000/gtfs/public-transit?origin_lat=-23.55&origin_lon=-46.63&destination_lat=-23.56&destination_lon=-46.65&cidade=sao_paulo"
+```

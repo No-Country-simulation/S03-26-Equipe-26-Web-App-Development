@@ -1,38 +1,42 @@
 # Smart Traffic Flow
 
-Aplicação full stack para observabilidade e análise de mobilidade urbana, com backend em Spring Boot, frontend em React/Vite e integrações externas (SPTrans, TomTom, OpenWeather e Google OAuth).
+Plataforma full stack para monitoramento e análise de mobilidade urbana, com backend Java, microservice Python e frontend React.
 
-## Estado Atual (15/04/2026)
+## Estado do Projeto
 
-- Branch `dev` local sincronizada com `origin/dev`
-- Backend com autenticação JWT ativa
-- Persistência principal em PostgreSQL
-- Endpoints de tráfego, autenticação, transporte, GTFS, clima e analytics
-- Frontend funcional com Home/Login e componentes de visualização, com integração parcial com a API
+- Branch de entrega: `main`
+- Backend principal em `backend/` (Spring Boot + PostgreSQL)
+- Frontend ativo em `SmartTrafficFlow/smartTrafficFlow`
+- Microservice de apoio em `microservice/` (GTFS e analytics)
+- Pasta `frontend/` legado removida da `main`
 
 ## Stack
 
-### Backend
+### Backend (`backend/`)
 
 - Java 21
 - Spring Boot 3.5.11
-- Spring Web, WebFlux, Validation, Data JPA, Security, Actuator
+- Spring Web, Security, Validation, Data JPA, WebFlux, Actuator
 - OpenAPI/Swagger (`springdoc-openapi`)
 - PostgreSQL + Flyway
-- JTS + Hibernate Spatial
+- Hibernate Spatial + JTS
 - JWT (`jjwt`)
 - OAuth2 Client (Google)
 
-### Frontend
+### Frontend (`SmartTrafficFlow/smartTrafficFlow`)
 
-- React 19
-- Vite 8
-- ESLint
-- Leaflet + React-Leaflet
+- React 18 + Vite 8
+- Tailwind CSS 4
+- Axios
+- React Router
+- Recharts
+- Leaflet / React-Leaflet
 
-### Microservice (complementar)
+### Microservice (`microservice/`)
 
-- Python (pasta `microservice/`) para serviços auxiliares de roteamento, GTFS e analytics
+- Python
+- FastAPI
+- Pandas
 
 ## Documentação
 
@@ -40,26 +44,14 @@ Aplicação full stack para observabilidade e análise de mobilidade urbana, com
 - [Dados](docs/dados.md)
 - [Frontend](docs/frontend.md)
 
-## Arquitetura (alto nível)
-
-```mermaid
-flowchart LR
-    U[Usuário] --> F[Frontend React/Vite]
-    F --> B[Backend Spring Boot]
-    B --> P[(PostgreSQL)]
-    B --> S[SPTrans API]
-    B --> T[TomTom API]
-    B --> W[OpenWeather API]
-    B --> G[Google OAuth]
-```
-
 ## Estrutura do Projeto
 
 ```text
 .
 |-- backend/
-|-- frontend/
 |-- microservice/
+|-- SmartTrafficFlow/
+|   `-- smartTrafficFlow/
 |-- docs/
 |   |-- api.md
 |   |-- dados.md
@@ -68,59 +60,81 @@ flowchart LR
 `-- README_DADOS.md
 ```
 
+## Pré-requisitos
+
+- Java 21
+- Maven Wrapper (já incluso em `backend/`)
+- Python 3.10+
+- Node.js 18+
+- Docker + Docker Compose (opcional, recomendado para avaliação rápida)
+
 ## Como Executar
 
-### 1) Backend
+### Opção A: Ambiente completo com Docker Compose
 
-No diretório `backend`:
+Na raiz do projeto:
+
+```bash
+docker compose up --build
+```
+
+Serviços:
+
+- Frontend: `http://localhost:5173`
+- Backend Java: `http://localhost:8080`
+- Swagger Java: `http://localhost:8080/swagger-ui/index.html`
+- Microservice Python: `http://localhost:8000`
+- PostgreSQL: `localhost:5432`
+
+### Opção B: Execução local por serviço
+
+1. Backend:
 
 ```powershell
+cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
-ou
+2. Microservice:
 
 ```bash
-./mvnw spring-boot:run
+cd microservice
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
 
-Backend local:
-
-- API: `http://localhost:8080`
-- Swagger UI: `http://localhost:8080/swagger-ui/index.html`
-- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
-
-### 2) Frontend
-
-No diretório `frontend`:
+3. Frontend:
 
 ```bash
+cd SmartTrafficFlow/smartTrafficFlow
 npm install
 npm run dev
 ```
 
-Frontend local:
+## Variáveis de Ambiente
 
-- `http://localhost:5173`
+As variáveis abaixo são usadas no backend Java e no compose:
 
-## Variáveis de Ambiente (backend)
-
-Principais chaves usadas pelo backend:
-
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
 - `JWT_SECRET`
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
 - `SPTRANS_TOKEN`
-- `TOMTOM_API_KEY`
+- `SPTRANS_API_URL`
 - `OPENWEATHER_API_KEY`
+- `TOMTOM_API_KEY`
+- `API_TOMTOM_BASE_URL`
 - `SERPER_API_KEY`
 
-Diretrizes:
+Observação:
 
-- manter `.env.example` sem segredos reais
-- não versionar credenciais/tokens no repositório
+- `SPTRANS_API_URL` mapeia para `sptrans.api.url`.
+- `API_TOMTOM_BASE_URL` mapeia para `api.tomtom.base-url`.
+- No ambiente Docker, a URL do banco já é injetada pelo `docker-compose.yml`.
 
-## Endpoints Principais (visão geral)
+## Endpoints Principais (resumo)
 
 - `POST /auth/register`
 - `POST /auth/login`
@@ -134,13 +148,13 @@ Diretrizes:
 - `GET /api/transporte/*`
 - `GET /api/gtfs/*`
 - `GET /api/analytics/crowd-flow`
-- `GET /api/test/clima`
+- `GET /api/test/clima*`
 
-Detalhes completos em [docs/api.md](docs/api.md).
+Detalhamento completo em [docs/api.md](docs/api.md).
 
-## Testes
+## Testes Automatizados
 
-Suites de teste presentes em `backend/src/test`:
+No backend (`backend/src/test`):
 
 - `TrafficControllerIntegrationTest`
 - `TrafficAggregationTest`
@@ -148,4 +162,4 @@ Suites de teste presentes em `backend/src/test`:
 
 ## Licença
 
-Este projeto está licenciado sob MIT. Veja [LICENSE](LICENSE).
+Projeto sob licença MIT. Consulte [LICENSE](LICENSE).

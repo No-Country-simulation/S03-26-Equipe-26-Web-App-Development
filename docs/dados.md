@@ -1,39 +1,24 @@
 # Dados
 
-Este documento descreve o estado atual das fontes de dados, contratos e pipeline de persistência da aplicação.
+Este documento descreve o estado atual das fontes de dados e da persistência na branch `main`.
 
-## Fontes de dados no repositório
-
-Atualmente existem múltiplas fontes de dados com papéis distintos:
+## Fontes de Dados no Repositório
 
 - `backend/src/main/resources/import.sql`
 - `backend/src/main/resources/traffic_data.json`
 - `traffic_data.json` (raiz)
-- `generator.py` (geração auxiliar)
+- Dados GTFS em `microservice/data/*`
 
-## O que o backend usa no estado atual
+## Persistência Principal (Backend Java)
 
-### Persistência principal
-
-- Banco: PostgreSQL (`application.properties`)
+- Banco: PostgreSQL
+- Tabela principal: `traffic_data`
 - Entidade: `TrafficData`
-- Tabela: `traffic_data`
+- Restrição de unicidade: `idvia + hora`
 
-### Carga via endpoint
+Campos principais de `TrafficData`:
 
-- `POST /traffic/load` chama `TrafficService.loadData()`
-- Fluxo atual consome SPTrans (`/Corredor`) e não JSON local
-
-### Massa SQL
-
-- Existe `import.sql` com registros de tráfego e geometria (`POINT`)
-- Mantido como baseline para ambiente local e testes de consistência
-
-## Modelo de dado persistido (`TrafficData`)
-
-Campos principais:
-
-- `id` (PK)
+- `id`
 - `idvia`
 - `nome`
 - `tipo` (`TypeOfRoute`)
@@ -44,43 +29,59 @@ Campos principais:
 - `nivel`
 - `status` (`StatusTrafego`)
 - `alerta` (`TrafficAlert`)
-- `geom` (`Point`, SRID 4326)
+- `geom` (`geometry(Point,4326)`)
 
-Regra de integridade importante:
+Observações:
 
-- unique constraint em `idvia + hora`
+- `lat` e `lng` são derivados de `geom` nos getters da entidade.
+- `geom` não é exposto diretamente no JSON de resposta.
 
-## Contrato de carga por DTO (`TrafficDataDTO`)
+## Fluxos de Carga
 
-Campos esperados pelo DTO:
+### Carga operacional
 
-- `idvia`, `nome`, `tipo`, `hora`
-- `clima`, `volume`, `capacidade`, `nivel`, `status`, `alerta`
-- `lat`, `lng`
+- Endpoint: `POST /traffic/load`
+- Implementação: `TrafficService.loadData()`
+- Fonte atual: API SPTrans (`/Corredor`)
 
-Observação:
+### Massa local
 
-- O DTO permanece útil para carga JSON, mas o fluxo de `POST /traffic/load` na branch atual está orientado a SPTrans.
+- `import.sql` é usado como baseline local
+- JSONs locais continuam disponíveis para apoio e consistência
 
-## Fluxo de transformação para resposta da API
+## Transformação para Resposta de API
 
-`TrafficData` -> `TrafficResponse`
+Fluxo principal:
 
-A resposta exposta para frontend prioriza:
+- `TrafficData` -> `TrafficResponse`
+
+A resposta ao frontend prioriza:
 
 - metadados de via/tráfego
 - coordenadas `lat/lng`
-- sem exposição direta de `geom`
+- ocultação do campo espacial bruto (`geom`)
 
-## Divergências e pontos de atenção
+## Integrações Externas com Impacto em Dados
 
-- Existem arquivos de dados em duplicidade (raiz e `backend/resources`).
-- O fluxo historicamente documentado como JSON local não representa mais o endpoint de carga atual.
-- Parte do comportamento depende de APIs externas (SPTrans, TomTom, geocoding), com fallback em caso de falha.
+No backend Java:
 
-## Recomendações técnicas
+- SPTrans
+- TomTom
+- OpenWeather
+- Google OAuth
 
-1. Definir oficialmente uma única fonte de massa estática (`import.sql` ou `traffic_data.json` versionado no backend).
-2. Documentar quando usar carga SPTrans vs massa local.
-3. Criar `schema` de entrada versionado para JSON (se o fluxo voltar a ser usado em produção).
-4. Evitar versionamento de dados sensíveis e tokens no repositório.
+No microservice Python:
+
+- datasets GTFS por cidade (`sp`, `rj`, `porto`)
+
+## Pontos de Atenção para Avaliação
+
+- Existe duplicidade de arquivos de massa entre raiz e `backend/src/main/resources`.
+- Alguns fluxos operam com fallback/mock quando provedores externos falham.
+- Frontend principal consome backend Java e microservice Python em paralelo.
+
+## Recomendações Pós-Entrega
+
+1. Definir uma estratégia única para massa estática (SQL vs JSON).
+2. Criar um `.env.example` consolidado para setup rápido de ambiente.
+3. Documentar política de versão para arquivos GTFS grandes.

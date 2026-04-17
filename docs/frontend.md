@@ -1,94 +1,99 @@
 # Frontend
 
-Este documento descreve o estado atual da camada frontend na branch `dev`.
+Este documento descreve o frontend ativo da branch `main`.
 
-## Stack
+## Frontend Oficial da Entrega
 
-- React 19
-- Vite 8
-- ESLint
-- Leaflet 1.9.4
-- React-Leaflet 5.0.0
+Diretório:
 
-## Estrutura principal
-
-- `frontend/src/App.jsx`
-- `frontend/src/pages/home/Home.jsx`
-- `frontend/src/pages/login/Login.jsx`
-- `frontend/src/utils/*` (gráficos)
-
-## Estado atual da interface
-
-### App
-
-`App.jsx` alterna entre Home e Login por estado local:
-
-- `statusLogin = false` => renderiza Home
-- `statusLogin = true` => renderiza Login
-
-No estado atual, a Home é a tela inicial exibida por padrão.
-
-### Home
-
-A tela Home entrega:
-
-- identidade visual do projeto
-- seleção `LOCAL` x `TRAJETO`
-- listagem e detalhe de dados com modal
-- visualizações gráficas (barra, linha, pizza) via utilitários locais
-
-Fonte de dados atual da Home:
-
-- import direto de `traffic_data.json` da raiz
-
-Observação importante:
-
-- chamadas `fetch` para backend existem no código, mas estão desativadas (comentadas).
-
-### Login
-
-A tela Login possui:
-
-- layout de login
-- botão de conta Google
+- `SmartTrafficFlow/smartTrafficFlow`
 
 Observação:
 
-- a integração efetiva de login com backend ainda não está conectada ao fluxo de navegação da UI.
+- A pasta `frontend/` antiga foi removida da `main`.
 
-## Integração com API (status)
+## Stack
 
-- Integração parcial / em evolução
-- Backend possui endpoints prontos, porém o frontend ainda utiliza majoritariamente dados locais
-- Integrações prioritárias:
-- `/auth/login`
-- `/traffic/insights`
-- `/traffic/filter`
-- `/traffic/traffic-volume-area`
+- React 18
+- Vite 8
+- Tailwind CSS 4
+- Axios
+- React Router
+- Recharts
+- Leaflet / React-Leaflet / Leaflet Heat / Leaflet Routing Machine
+- Lucide React
 
-## Como executar
+## Estrutura Principal
 
-No diretório `frontend`:
+- `src/App.jsx`
+- `src/context/AuthContext.jsx`
+- `src/pages/Login/Login.jsx`
+- `src/pages/Dashboard/Dashboard.jsx`
+- `src/pages/Dashboard/DashboardMap.jsx`
+- `src/services/api.js`
+
+## Fluxo de Navegação
+
+- `/login`
+- `/dashboard` (rota protegida)
+- `/` redireciona conforme autenticação
+
+## Integrações de API no Frontend
+
+### Backend Java (`http://localhost:8080`)
+
+- `POST /auth/login`
+- `POST /auth/register`
+- `GET /traffic/sptrans/posicao`
+- `GET /traffic/route`
+- `GET /traffic/traffic-volume`
+- `GET /traffic/traffic-volume-area`
+- `GET /traffic`
+- `GET /api/analytics/crowd-flow` (via fetch)
+
+### Microservice Python (`http://localhost:8000`)
+
+- `GET /gtfs/public-transit`
+- `GET /gtfs/stops/nearby/{cidade}`
+- `GET /gtfs/routes/{cidade}`
+- `GET /gtfs/bus-route`
+- `GET /analytics/analise/{cidade}`
+
+## APIs externas chamadas direto no frontend
+
+- Nominatim (geocoding)
+- Open-Meteo (clima)
+
+## Funcionalidades Visíveis no Dashboard
+
+- Busca de origem e destino por texto
+- Geocoding de endereços
+- Cálculo de rota com prioridade para GTFS (Python) e fallback Java
+- Atualização periódica de posição de ônibus
+- Mapa com rota, ônibus e heatmap
+- Cards de telemetria (velocidade, clima, vento, congestionamento)
+- Gráfico de volume de tráfego por origem/destino
+
+## Divergências Conhecidas de Contrato
+
+Chamadas presentes no frontend sem endpoint correspondente hoje:
+
+- `GET /auth/verify` (backend Java)
+- `POST /traffic/history` (backend Java)
+- `GET /traffic/dashboard-complete` (backend Java)
+- `GET /analytics/forecast` (microservice)
+
+Essas chamadas não impedem o fluxo principal de demonstração, mas devem ser tratadas em ciclo posterior.
+
+## Como Executar
+
+No diretório `SmartTrafficFlow/smartTrafficFlow`:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Ambiente local padrão:
+URL local:
 
 - `http://localhost:5173`
-
-## Dependências confirmadas no `package.json`
-
-- `react`
-- `react-dom`
-- `leaflet`
-- `react-leaflet`
-
-## Riscos e ajustes recomendados para Demo Day
-
-1. Conectar Home com `GET /traffic` e `GET /traffic/insights` (retirar dependência do JSON local para o fluxo principal).
-2. Conectar Login com `POST /auth/login` e armazenamento de token para chamadas autenticadas.
-3. Definir variável de ambiente de frontend para base URL da API.
-4. Atualizar `frontend/README.md` (atualmente template padrão do Vite).
