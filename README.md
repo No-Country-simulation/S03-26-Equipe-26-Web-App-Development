@@ -10,6 +10,20 @@ Plataforma full stack para monitoramento e análise de mobilidade urbana, com ba
 - Microservice de apoio em `microservice/` (GTFS e analytics)
 - Pasta `frontend/` legado removida da `main`
 
+## Arquitetura (Visão Geral)
+
+```mermaid
+flowchart LR
+    U[Usuário] --> F[Frontend React]
+    F --> B[Backend Java Spring Boot]
+    F --> P[Microservice Python FastAPI]
+    B --> DB[(PostgreSQL/PostGIS)]
+    B --> TT[TomTom API]
+    B --> SP[SPTrans API]
+    B --> OW[OpenWeather API]
+    P --> GTFS[(Dados GTFS)]
+```
+
 ## Stack
 
 ### Backend (`backend/`)
@@ -56,8 +70,7 @@ Plataforma full stack para monitoramento e análise de mobilidade urbana, com ba
 |   |-- api.md
 |   |-- dados.md
 |   `-- frontend.md
-|-- README.md
-`-- README_DADOS.md
+`-- README.md
 ```
 
 ## Pré-requisitos

@@ -38,6 +38,17 @@ Observação:
 - `/dashboard` (rota protegida)
 - `/` redireciona conforme autenticação
 
+### Fluxo de Dados (Frontend)
+
+```mermaid
+flowchart TD
+    A[Login / Dashboard] --> B[src/services/api.js]
+    B --> C[Backend Java :8080]
+    B --> D[Microservice Python :8000]
+    C --> E[(PostgreSQL/PostGIS)]
+    D --> F[(GTFS local)]
+```
+
 ## Integrações de API no Frontend
 
 ### Backend Java (`http://localhost:8080`)

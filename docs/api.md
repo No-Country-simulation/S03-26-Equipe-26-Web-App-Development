@@ -36,6 +36,23 @@ Header esperado nas rotas autenticadas:
 
 - `Authorization: Bearer <token>`
 
+### Fluxo de Autenticação (JWT)
+
+```mermaid
+sequenceDiagram
+    participant Cliente
+    participant API as Backend API
+    participant Auth as AuthController
+    participant Sec as SecurityConfig/JwtFilter
+
+    Cliente->>Auth: POST /auth/login
+    Auth-->>Cliente: token JWT
+    Cliente->>API: GET /traffic (Authorization: Bearer token)
+    API->>Sec: valida token
+    Sec-->>API: token válido
+    API-->>Cliente: 200 OK
+```
+
 ## Endpoints do Backend Java
 
 ### Autenticação (`/auth`)
